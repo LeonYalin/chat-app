@@ -16,11 +16,9 @@ export function ChatMessageBox(props: Props) {
   return (
     <Wrapper>
       <TextField id="msgbox" value={text} onChange={e => setText(e.target.value)} label="Type a new message" variant="outlined" fullWidth />
-      <div style={{ display: 'flex' }} onClick={() => props.onChatMessage(text)}>
-        <IconButton color="primary" aria-label="Send">
-          <SendIcon fontSize="large" />
-        </IconButton>
-      </div>
+      <IconButton color="primary" aria-label="Send" onClick={() => props.onChatMessage(text)}>
+        <SendIcon fontSize="large" />
+      </IconButton>
     </Wrapper>
   );
 }
