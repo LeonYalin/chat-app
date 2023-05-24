@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 import { Route, Routes } from 'react-router-dom';
-import { ChatMain } from './components/chat/ChatMain';
+import { ChatMain } from './features/chat/ChatMain';
 import { CssBaseline } from '@mui/material';
 
 const StyledApp = styled.div`

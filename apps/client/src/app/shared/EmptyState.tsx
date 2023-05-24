@@ -4,7 +4,9 @@ import styled from 'styled-components';
 type Props = {
   icon: JSX.Element;
   messages: string[];
+  style?: React.CSSProperties;
   wrapperRef?: React.RefObject<HTMLElement>;
+  children?: React.ReactNode;
 };
 
 const Wrapper = styled.div<{ height: number | null }>`
@@ -13,12 +15,11 @@ const Wrapper = styled.div<{ height: number | null }>`
   align-items: center;
   justify-content: center;
   padding: 16px;
-  height: ${(props) =>
-    props.height ? 'calc(100vh - ' + props.height + 'px)' : '100%'};
+  height: ${props => (props.height ? 'calc(100vh - ' + props.height + 'px)' : '100%')};
 `;
 
 const Message = styled.div`
-  margin-top: 10px;
+  // margin-top: 5px;
   text-align: center;
 `;
 
@@ -41,11 +42,13 @@ export function EmptyState(props: Props) {
   }, [props.icon]);
 
   return (
-    <Wrapper height={wrapperHeight}>
+    <Wrapper style={props.style} height={wrapperHeight}>
       <div>{icon}</div>
-      {props.messages.map((message) => (
-        <Message>{message}</Message>
+      {props.messages.map((message, i) => (
+        <Message key={i}>{message}</Message>
       ))}
+      {props.children && <div style={{ marginTop: '10px' }}></div>}
+      {props.children}
     </Wrapper>
   );
 }
