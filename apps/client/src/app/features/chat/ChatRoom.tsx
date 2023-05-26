@@ -7,6 +7,7 @@ type Props = {
   chat: Chat | null;
   onChatMessage: (message: string) => void;
   onChatDelete: (chatId: string) => void;
+  onChatNameChange: (chatId: string, newName: string) => void;
   panelWidth: number;
 };
 
@@ -19,7 +20,7 @@ const Wrapper = styled.div<{ width: number | null }>`
 export function ChatRoom(props: Props) {
   return (
     <Wrapper width={props.panelWidth}>
-      <ChatHeader chat={props.chat} onChatDelete={props.onChatDelete}></ChatHeader>
+      <ChatHeader chat={props.chat} onChatDelete={props.onChatDelete} onChatNameChange={props.onChatNameChange}></ChatHeader>
       <ChatBody chat={props.chat} onChatMessage={props.onChatMessage}></ChatBody>
     </Wrapper>
   );

@@ -6,6 +6,7 @@ import App from './app/app';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import chatReducer from './app/features/chat/chat.slice';
+import { ConfirmDialogProvider } from './app/hooks/useConfirm';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -18,9 +19,11 @@ const store = configureStore({
 root.render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ConfirmDialogProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ConfirmDialogProvider>
     </Provider>
   </StrictMode>,
 );

@@ -1,17 +1,21 @@
-import { Toolbar, Box, Divider, Avatar, ListItemAvatar, IconButton } from '@mui/material';
+import { Toolbar, Box, Divider, Avatar, ListItemAvatar, IconButton, Popover, TextField, Button, Typography } from '@mui/material';
 import { Chat } from './chat.model';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useState } from 'react';
-import { ConfirmDialog } from '../../shared/ConfirmDialog';
+import { useRef, useState } from 'react';
+import { useConfirm } from '../../hooks/useConfirm';
 
 type Props = {
   chat: Chat | null;
   onChatDelete: (chatId: string) => void;
+  onChatNameChange: (chatId: string, newName: string) => void;
 };
 
 export function ChatHeader(props: Props) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [confirm, closeConfirm] = useConfirm();
+  const [chatNameForEdit, setChatNameForEdit] = useState(props.chat?.name);
+  const editBtnRef = useRef(null);
 
   return (
     <>
@@ -23,24 +27,61 @@ export function ChatHeader(props: Props) {
                 <Avatar alt={props.chat?.avatarUrl} src="/static/images/avatar/1.jpg" />
               </ListItemAvatar>
               {props.chat?.name}
-              <IconButton aria-label="Edit">
+              <IconButton aria-label="Edit" ref={editBtnRef} onClick={() => setPopoverOpen(true)}>
                 <EditIcon />
               </IconButton>
+              <Popover
+                open={popoverOpen}
+                anchorEl={editBtnRef.current}
+                onClose={() => setPopoverOpen(false)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+              >
+                <Typography sx={{ p: 2 }}>
+                  <TextField
+                    value={chatNameForEdit}
+                    onChange={e => setChatNameForEdit(e.target.value)}
+                    label="Chat Name"
+                    variant="outlined"
+                    fullWidth
+                  />
+                  <Typography sx={{ pt: 2, display: 'flex', justifyContent: 'flex-end', width: '300px' }}>
+                    <Button onClick={() => setPopoverOpen(false)}>Cancel</Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        props.chat && props.onChatNameChange(props.chat.id, chatNameForEdit || '');
+                        setPopoverOpen(false);
+                      }}
+                      autoFocus
+                    >
+                      OK
+                    </Button>
+                  </Typography>
+                </Typography>
+              </Popover>
             </Box>
             <Box sx={{ flexGrow: 0 }}>
-              <IconButton aria-label="Delete" onClick={() => setDialogOpen(true)}>
+              <IconButton
+                aria-label="Delete"
+                onClick={() => {
+                  confirm({
+                    title: 'Delete Chat',
+                    content: 'Are you sure you want to delete the chat and all its contents?',
+                    onConfirm: () => {
+                      props.chat && props.onChatDelete(props.chat.id);
+                      closeConfirm();
+                    },
+                    onCancel: () => {
+                      closeConfirm();
+                    },
+                  });
+                }}
+              >
                 <DeleteIcon />
               </IconButton>
-              <ConfirmDialog
-                title="Delete Chat"
-                content="Are you sure you want to delete the chat and all its contents?"
-                open={dialogOpen}
-                onConfirm={() => {
-                  setDialogOpen(false);
-                  props.chat && props.onChatDelete(props.chat.id);
-                }}
-                onCancel={() => setDialogOpen(false)}
-              ></ConfirmDialog>
             </Box>
           </>
         ) : null}

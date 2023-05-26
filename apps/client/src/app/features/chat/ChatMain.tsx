@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { ChatsPanel } from './ChatsPanel';
 import { ChatRoom } from './ChatRoom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { addChat, selectChats, selectSelectedChat, addChatMessage, deleteChat } from './chat.slice';
+import { addChat, selectChats, selectSelectedChat, addChatMessage, deleteChat, changeChatName } from './chat.slice';
 
 const panelWidth = 240;
 
@@ -20,6 +20,7 @@ export function ChatMain() {
         chat={selectedChat}
         onChatMessage={content => dispatch(addChatMessage({ content }))}
         onChatDelete={chatId => dispatch(deleteChat({ chatId }))}
+        onChatNameChange={(chatId, newName) => dispatch(changeChatName({ chatId, newName }))}
       ></ChatRoom>
     </Box>
   );
