@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRef, useState } from 'react';
 import { useConfirm } from '../../hooks/useConfirm';
+import { useEffect } from 'react';
 
 type Props = {
   chat: Chat | null;
@@ -14,8 +15,12 @@ type Props = {
 export function ChatHeader(props: Props) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [confirm, closeConfirm] = useConfirm();
-  const [chatNameForEdit, setChatNameForEdit] = useState(props.chat?.name);
+  const [chatNameForEdit, setChatNameForEdit] = useState('');
   const editBtnRef = useRef(null);
+
+  useEffect(() => {
+    setChatNameForEdit(props.chat?.name || '');
+  }, [props.chat]);
 
   return (
     <>
@@ -39,7 +44,7 @@ export function ChatHeader(props: Props) {
                   horizontal: 'left',
                 }}
               >
-                <Typography sx={{ p: 2 }}>
+                <Typography component={'div'} sx={{ p: 2 }}>
                   <TextField
                     value={chatNameForEdit}
                     onChange={e => setChatNameForEdit(e.target.value)}
@@ -47,12 +52,12 @@ export function ChatHeader(props: Props) {
                     variant="outlined"
                     fullWidth
                   />
-                  <Typography sx={{ pt: 2, display: 'flex', justifyContent: 'flex-end', width: '300px' }}>
+                  <Typography component={'div'} sx={{ pt: 2, display: 'flex', justifyContent: 'flex-end', width: '300px' }}>
                     <Button onClick={() => setPopoverOpen(false)}>Cancel</Button>
                     <Button
                       variant="contained"
                       onClick={() => {
-                        props.chat && props.onChatNameChange(props.chat.id, chatNameForEdit || '');
+                        props.chat && props.onChatNameChange(props.chat.id, chatNameForEdit);
                         setPopoverOpen(false);
                       }}
                       autoFocus
