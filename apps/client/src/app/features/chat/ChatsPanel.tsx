@@ -25,6 +25,7 @@ export function ChatsPanel(props: Props) {
 
   return (
     <Drawer
+      data-testid="chats-panel"
       sx={{
         width: props.panelWidth,
         flexShrink: 0,
@@ -41,9 +42,9 @@ export function ChatsPanel(props: Props) {
       <Divider />
       <ListWrapper ref={listWrapperRef}>
         {props.chats.length ? (
-          <List>
+          <List data-testid="chats-list">
             {props.chats.map(chat => (
-              <ListItem key={chat.id} disablePadding>
+              <ListItem data-testid="chats-list-item" key={chat.id} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>{<AccountCircleIcon />}</ListItemIcon>
                   <ListItemText primary={chat.name} />
@@ -53,7 +54,7 @@ export function ChatsPanel(props: Props) {
           </List>
         ) : (
           <EmptyState icon={<ChatIcon />} messages={emptyStateMessages}>
-            <Button variant="outlined" startIcon={<AddIcon />} onClick={props.onAddChatClick}>
+            <Button data-testid="add-chat" variant="outlined" startIcon={<AddIcon />} onClick={props.onAddChatClick}>
               Add Chat
             </Button>
           </EmptyState>

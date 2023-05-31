@@ -15,8 +15,16 @@ export function ChatMessageBox(props: Props) {
   const [text, setText] = useState('');
   return (
     <Wrapper>
-      <TextField id="msgbox" value={text} onChange={e => setText(e.target.value)} label="Type a new message" variant="outlined" fullWidth />
-      <IconButton color="primary" aria-label="Send" onClick={() => props.onChatMessage(text)}>
+      <TextField
+        inputProps={{ 'data-testid': 'chat-message-box-input' }}
+        id="msgbox"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        label="Type a new message"
+        variant="outlined"
+        fullWidth
+      />
+      <IconButton data-testid="chat-message-box-send-btn" color="primary" aria-label="Send" onClick={() => props.onChatMessage(text)}>
         <SendIcon fontSize="large" />
       </IconButton>
     </Wrapper>

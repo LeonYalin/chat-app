@@ -1,10 +1,31 @@
 import { createContext, useContext, useState } from 'react';
-import { ConfirmDialog, ConfirmDialogOptions } from '../shared/ConfirmDialog';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { noop } from '../utils/app-utils';
 
-type ConfirmDialogApi = [(data: ConfirmDialogOptions) => void, () => void];
+export interface ConfirmDialogOptions {
+  open?: boolean;
+  title?: string;
+  content?: string;
+  confirmButtonText?: string;
+  cancelButtonText?: string;
+  onClose?: () => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+}
 
-const ConfirmDialogCtx = createContext<ConfirmDialogApi>([noop, noop]);
+interface ConfirmDialogApi {
+  showConfirm: (data: ConfirmDialogOptions) => void;
+  closeConfirm: () => void;
+  getState(): ConfirmDialogOptions;
+}
+
+const defaultDialogApi: ConfirmDialogApi = {
+  showConfirm: noop,
+  closeConfirm: noop,
+  getState: () => ({} as ConfirmDialogOptions),
+};
+
+const ConfirmDialogCtx = createContext<ConfirmDialogApi>(defaultDialogApi);
 
 type Props = {
   children: React.ReactNode;
@@ -12,18 +33,23 @@ type Props = {
 
 export function ConfirmDialogProvider(props: Props) {
   const [state, setState] = useState<ConfirmDialogOptions>({ open: false });
-  const confirm = (data: ConfirmDialogOptions) => {
-    setState({
-      ...data,
-      open: true,
-    });
+
+  const confirmApi: ConfirmDialogApi = {
+    showConfirm: (data: ConfirmDialogOptions) => {
+      setState({
+        ...data,
+        open: true,
+      });
+    },
+    closeConfirm: () => {
+      setState({
+        open: false,
+      });
+    },
+    getState: () => {
+      return state;
+    },
   };
-  const closeConfirm = () => {
-    setState({
-      open: false,
-    });
-  };
-  const confirmApi: ConfirmDialogApi = [confirm, closeConfirm];
 
   return (
     <ConfirmDialogCtx.Provider value={confirmApi}>

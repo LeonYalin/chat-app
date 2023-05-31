@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   padding: 16px;
 `;
 
-const noChatMessages = ['Select a chat to start messaging.'];
+const noChatMessages = ['Select a chat to start messaging'];
 const emptyConversationMessages = ["You're starting a new conversation.", 'Type your first message below.'];
 
 export function ChatBody(props: Props) {

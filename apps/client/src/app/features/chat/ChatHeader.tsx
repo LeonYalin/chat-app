@@ -14,7 +14,7 @@ type Props = {
 
 export function ChatHeader(props: Props) {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [confirm, closeConfirm] = useConfirm();
+  const { showConfirm, closeConfirm } = useConfirm();
   const [chatNameForEdit, setChatNameForEdit] = useState('');
   const editBtnRef = useRef(null);
 
@@ -32,7 +32,7 @@ export function ChatHeader(props: Props) {
                 <Avatar alt={props.chat?.avatarUrl} src="/static/images/avatar/1.jpg" />
               </ListItemAvatar>
               {props.chat?.name}
-              <IconButton aria-label="Edit" ref={editBtnRef} onClick={() => setPopoverOpen(true)}>
+              <IconButton data-testid="edit-btn" aria-label="Edit" ref={editBtnRef} onClick={() => setPopoverOpen(true)}>
                 <EditIcon />
               </IconButton>
               <Popover
@@ -46,6 +46,7 @@ export function ChatHeader(props: Props) {
               >
                 <Typography component={'div'} sx={{ p: 2 }}>
                   <TextField
+                    inputProps={{ 'data-testid': 'chat-name-edit' }}
                     value={chatNameForEdit}
                     onChange={e => setChatNameForEdit(e.target.value)}
                     label="Chat Name"
@@ -56,6 +57,7 @@ export function ChatHeader(props: Props) {
                     <Button onClick={() => setPopoverOpen(false)}>Cancel</Button>
                     <Button
                       variant="contained"
+                      data-testid="chat-name-edit-submit"
                       onClick={() => {
                         props.chat && props.onChatNameChange(props.chat.id, chatNameForEdit);
                         setPopoverOpen(false);
@@ -70,9 +72,10 @@ export function ChatHeader(props: Props) {
             </Box>
             <Box sx={{ flexGrow: 0 }}>
               <IconButton
+                data-testid="delete-btn"
                 aria-label="Delete"
                 onClick={() => {
-                  confirm({
+                  showConfirm({
                     title: 'Delete Chat',
                     content: 'Are you sure you want to delete the chat and all its contents?',
                     onConfirm: () => {
@@ -81,6 +84,9 @@ export function ChatHeader(props: Props) {
                     },
                     onCancel: () => {
                       closeConfirm();
+                    },
+                    onClose: () => {
+                      console.log('close');
                     },
                   });
                 }}

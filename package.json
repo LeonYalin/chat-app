@@ -7,7 +7,8 @@
     "start": "nx serve client",
     "start:server": "nx serve server",
     "start:all": "npm start && npm run start:server",
-    "test": "nx test client"
+    "test": "nx test client",
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -40,7 +41,10 @@
     "@nrwl/workspace": "15.8.6",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@svgr/webpack": "^6.1.2",
+    "@testing-library/dom": "^9.3.0",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/express": "4.17.13",
     "@types/jest": "^29.4.0",
     "@types/node": "18.14.2",
