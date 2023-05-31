@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import type { AppState, AppThunk } from '../../store';
+import type { RootState, AppThunk } from '../../store';
 // import { fetchCount } from './counterAPI';
 import { Chat, ChatUser, createChat, createChatMessage } from './chat.model';
 
@@ -90,9 +90,9 @@ export const { addChat, deleteChat, addParticipantToChat, changeChatName, addCha
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
-export const selectChatState = (state: AppState) => state.chat;
-export const selectChats = (state: AppState) => state.chat.chats;
-export const selectSelectedChat = (state: AppState) => state.chat.chats.find(chat => chat.id === state.chat.selectedChatId) || null;
+export const selectChatState = (state: RootState) => state.chat;
+export const selectChats = (state: RootState) => state.chat.chats;
+export const selectSelectedChat = (state: RootState) => state.chat.chats.find(chat => chat.id === state.chat.selectedChatId) || null;
 
 // We can also write thunks by hand, which may contain both sync and async logic.
 // Here's an example of conditionally dispatching actions based on current state.

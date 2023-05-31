@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import DataObjectIcon from '@mui/icons-material/DataObject';
 
 type Props = {
-  icon: JSX.Element;
-  messages: string[];
+  icon?: JSX.Element;
+  messages?: string[];
   style?: React.CSSProperties;
   wrapperRef?: React.RefObject<HTMLElement>;
   children?: React.ReactNode;
@@ -25,7 +26,9 @@ const Message = styled.div`
 
 export function EmptyState(props: Props) {
   const [wrapperHeight, setWrapperHeight] = useState<number | null>(null);
-  const [icon, setIcon] = useState<JSX.Element | null>(null);
+  const [icon, setIcon] = useState<JSX.Element | null>(<DataObjectIcon />);
+  const messages = props.messages || ['No data to display'];
+
   useEffect(() => {
     if (props.wrapperRef?.current) {
       setWrapperHeight(props.wrapperRef.current.offsetHeight);
@@ -44,7 +47,7 @@ export function EmptyState(props: Props) {
   return (
     <Wrapper style={props.style} height={wrapperHeight}>
       <div>{icon}</div>
-      {props.messages.map((message, i) => (
+      {messages.map((message, i) => (
         <Message key={i}>{message}</Message>
       ))}
       {props.children && <div style={{ marginTop: '10px' }}></div>}

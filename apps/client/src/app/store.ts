@@ -1,24 +1,24 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Action, PreloadedState, combineReducers } from '@reduxjs/toolkit';
 
 import chatReducer from './features/chat/chat.slice';
 
-export function makeStore() {
+const rootReducer = combineReducers({
+  chat: chatReducer,
+});
+
+export function setupStore(preloadedState?: PreloadedState<RootState>) {
   return configureStore({
-    reducer: { chat: chatReducer },
+    reducer: rootReducer,
+    preloadedState,
   });
 }
 
-const store = makeStore();
+const store = setupStore();
 
-export type AppState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppStore = ReturnType<typeof setupStore>;
+export type AppDispatch = AppStore['dispatch'];
 
-export type AppDispatch = typeof store.dispatch;
-
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  AppState,
-  unknown,
-  Action<string>
->;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;
 
 export default store;

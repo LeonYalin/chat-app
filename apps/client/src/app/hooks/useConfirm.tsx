@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import { ConfirmDialog, ConfirmDialogOptions } from '../shared/ConfirmDialog';
-import { noop } from '../shared/utils';
+import { noop } from '../utils/app-utils';
 
 type ConfirmDialogApi = [(data: ConfirmDialogOptions) => void, () => void];
 
