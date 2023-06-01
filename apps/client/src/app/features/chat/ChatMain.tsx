@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { ChatsPanel } from './ChatsPanel';
 import { ChatRoom } from './ChatRoom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { addChat, selectChats, selectSelectedChat, addChatMessage, deleteChat, changeChatName } from './chat.slice';
+import { selectChats, selectSelectedChat, addChatMessage, deleteChat, changeChatName, addChatAsync } from './chat.slice';
 
 const panelWidth = 240;
 
@@ -14,7 +14,7 @@ export function ChatMain() {
   const selectedChat = useAppSelector(selectSelectedChat);
   return (
     <Box sx={{ display: 'flex' }}>
-      <ChatsPanel panelWidth={panelWidth} chats={chats} onAddChatClick={() => dispatch(addChat())}></ChatsPanel>
+      <ChatsPanel panelWidth={panelWidth} chats={chats} onAddChatClick={() => dispatch(addChatAsync())}></ChatsPanel>
       <ChatRoom
         panelWidth={panelWidth}
         chat={selectedChat}

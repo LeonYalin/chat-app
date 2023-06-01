@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
-import { noop } from '../utils/app-utils';
+import { noop } from '../utils/app.utils';
 
 export interface ConfirmDialogOptions {
   open?: boolean;
