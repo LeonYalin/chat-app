@@ -31,7 +31,8 @@
       },
       "configurations": {
         "development": {
-          "buildTarget": "server:build:development"
+          "buildTarget": "server:build:development",
+          "inspect": true
         },
         "production": {
           "buildTarget": "server:build:production"

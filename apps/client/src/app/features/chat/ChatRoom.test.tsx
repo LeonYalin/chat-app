@@ -1,7 +1,7 @@
 import { renderWithProviders } from '@client/utils/test-utils';
 import { ChatRoom } from './ChatRoom';
-import { Chat, createChat } from './chat.model';
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
+import { Chat, createChat } from '@shared/models/chat.model';
 
 let mockChat: Chat | null = null;
 let mockPanelWidth = 0;

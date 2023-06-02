@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useRef } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Chat } from './chat.model';
+import { Chat } from '@shared/models/chat.model';
 
 const ListWrapper = styled.div`
   overflow-y: auto;

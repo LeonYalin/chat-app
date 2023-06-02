@@ -1,7 +1,7 @@
 import { renderWithProviders } from '@client/utils/test-utils';
 import { ChatMessages } from './ChatMessages';
-import { ChatMessage, createChatMessage } from './chat.model';
 import { screen } from '@testing-library/dom';
+import { ChatMessage, createChatMessage } from '@shared/models/chat.model';
 
 const mockChatMessages: ChatMessage[] = [];
 

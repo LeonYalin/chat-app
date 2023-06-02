@@ -1,8 +1,7 @@
 import { renderWithProviders } from '@client/utils/test-utils';
-import { ChatHeader } from './ChatHeader';
-import { createChat } from './chat.model';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { ChatBody } from './ChatBody';
+import { createChat } from '@shared/models/chat.model';
 
 let mockChat: ReturnType<typeof createChat> | null = null;
 let mockOnChatMessage: jest.Mock;

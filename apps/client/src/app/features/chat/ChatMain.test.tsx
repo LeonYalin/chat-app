@@ -4,17 +4,46 @@ import { setupServer } from 'msw/node';
 import { AppStore, setupStore } from '@client/store';
 import { renderWithProviders } from '@client/utils/test-utils';
 import { graphql } from 'msw';
+import { Chat } from '@shared/models/chat.model';
 
 export const handlers = [
-  graphql.query('GetLocations', (req, res, ctx) => {
+  graphql.mutation('AddChat', (req, res, ctx) => {
+    const mockChat: Chat = {
+      id: '1',
+      name: 'test',
+      avatarUrl: 'test',
+      messages: [],
+      participants: [],
+      createdAt: new Date().toISOString(),
+    };
     return res(
       ctx.data({
-        locations: {
-          id: '1',
-          name: 'test',
-          description: 'test',
-          photo: 'test',
-        },
+        addChat: mockChat,
+      }),
+    );
+  }),
+  graphql.query('LoadChats', (req, res, ctx) => {
+    const mockChats: Chat[] = [
+      {
+        id: '1',
+        name: 'test',
+        avatarUrl: 'test',
+        messages: [],
+        participants: [],
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        name: 'test2',
+        avatarUrl: 'test2',
+        messages: [],
+        participants: [],
+        createdAt: new Date().toISOString(),
+      },
+    ];
+    return res(
+      ctx.data({
+        chats: mockChats,
       }),
     );
   }),
@@ -36,6 +65,13 @@ beforeEach(() => {
 it('should render correctly', () => {
   const { baseElement } = renderWithProviders(<ChatMain />);
   expect(baseElement).toBeTruthy();
+});
+
+it('should get chats from server correctly', () => {
+  renderWithProviders(<ChatMain />, { store });
+  waitFor(() => {
+    expect(store.getState().chat.chats.length).toBe(2);
+  });
 });
 
 it('should add a chat to the store correctly', () => {

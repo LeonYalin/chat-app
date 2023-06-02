@@ -1,10 +1,10 @@
 import { Toolbar, Box, Divider, Avatar, ListItemAvatar, IconButton, Popover, TextField, Button, Typography } from '@mui/material';
-import { Chat } from './chat.model';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRef, useState } from 'react';
 import { useConfirm } from '../../hooks/useConfirm';
 import { useEffect } from 'react';
+import { Chat } from '@shared/models/chat.model';
 
 type Props = {
   chat: Chat | null;
@@ -86,7 +86,7 @@ export function ChatHeader(props: Props) {
                       closeConfirm();
                     },
                     onClose: () => {
-                      console.log('close');
+                      /** */
                     },
                   });
                 }}

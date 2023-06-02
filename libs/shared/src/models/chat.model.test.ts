@@ -1,5 +1,7 @@
 import { createChat, createChatMessage } from './chat.model';
 
+const now = new Date().toISOString();
+
 it('should create an empty chat correctly', () => {
   const chat = createChat();
   expect(chat).toEqual({
@@ -8,14 +10,14 @@ it('should create an empty chat correctly', () => {
     avatarUrl: '',
     messages: [],
     participants: [],
-    createdAt: expect.any(Number),
+    createdAt: expect.any(String),
   });
 });
 
 it('should create chat with data correctly', () => {
   const chat = createChat({
     name: 'My Chat',
-    createdAt: 123456,
+    createdAt: now,
     id: '123',
     avatarUrl: 'https://example.com',
     messages: [],
@@ -27,7 +29,7 @@ it('should create chat with data correctly', () => {
     avatarUrl: 'https://example.com',
     messages: [],
     participants: [],
-    createdAt: 123456,
+    createdAt: now,
   });
 });
 
@@ -37,7 +39,7 @@ it('should create an empty chat message correctly', () => {
     id: expect.any(String),
     content: '',
     chatUserId: 'Me',
-    createdAt: expect.any(Number),
+    createdAt: expect.any(String),
   });
 });
 
@@ -46,12 +48,12 @@ it('should create a chat message with data correctly', () => {
     id: '123',
     content: 'Hello',
     chatUserId: '123',
-    createdAt: 123456,
+    createdAt: now,
   });
   expect(chatMessage).toEqual({
     id: '123',
     content: 'Hello',
     chatUserId: '123',
-    createdAt: 123456,
+    createdAt: now,
   });
 });

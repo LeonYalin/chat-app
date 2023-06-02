@@ -2,10 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState, AppThunk } from '../../store';
 // import { fetchCount } from './counterAPI';
-import { Chat, ChatUser, createChat, createChatMessage } from './chat.model';
 import { gql } from '@apollo/client';
 import gqlClient from '@client/utils/graphql.utils';
 import { UIStatus } from '@client/utils/enums';
+import { ChatUser, createChatMessage, createChat, Chat } from '@shared/models/chat.model';
 
 export interface ChatState {
   chats: Chat[];
@@ -27,13 +27,49 @@ const initialState: ChatState = {
 // code can then be executed and other actions can be dispatched. Thunks are
 // typically used to make async requests.
 export const addChatAsync = createAsyncThunk('chat/addChatAsync', async () => {
-  const query = gql`
-    query GetLocations {
-      locations {
+  const mutation = gql`
+    mutation AddChat($chat: ChatInput!) {
+      addChat(chat: $chat) {
         id
         name
-        description
-        photo
+        avatarUrl
+        messages {
+          id
+          content
+          chatUserId
+          createdAt
+        }
+        participants {
+          id
+          name
+          avatarUrl
+        }
+        createdAt
+      }
+    }
+  `;
+  return gqlClient().mutate({ mutation, variables: { chat: createChat() } });
+});
+
+export const loadChatsAsync = createAsyncThunk('chat/loadChatsAsync', async () => {
+  const query = gql`
+    query LoadChats {
+      chats {
+        id
+        name
+        avatarUrl
+        messages {
+          id
+          content
+          chatUserId
+          createdAt
+        }
+        participants {
+          id
+          name
+          avatarUrl
+        }
+        createdAt
       }
     }
   `;
@@ -81,10 +117,16 @@ export const chatSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(addChatAsync.fulfilled, (state, action) => {
-        state.uiStatus = UIStatus.IDLE;
-        const newChat = createChat();
-        state.chats.push(newChat);
-        state.selectedChatId = newChat.id;
+        const addedChat = action.payload.data.addChat;
+        state.chats.push(addedChat);
+        state.selectedChatId = addedChat.id;
+      })
+      .addCase(loadChatsAsync.fulfilled, (state, action) => {
+        const chats = action.payload.data.chats;
+        if (chats.length > 0) {
+          state.selectedChatId = chats[0].id;
+          state.chats = chats;
+        }
       })
       .addMatcher(
         action => action.type.endsWith('/pending'),

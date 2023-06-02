@@ -1,5 +1,5 @@
 import { Avatar, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
-import { ChatMessage } from './chat.model';
+import { ChatMessage } from '@shared/models/chat.model';
 
 type Props = {
   messages: ChatMessage[];

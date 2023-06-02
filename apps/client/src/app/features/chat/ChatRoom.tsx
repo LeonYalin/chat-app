@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { ChatHeader } from './ChatHeader';
 import { ChatBody } from './ChatBody';
-import { Chat } from './chat.model';
+import { Chat } from '@shared/models/chat.model';
 
 type Props = {
   chat: Chat | null;

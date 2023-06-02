@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { EmptyState } from '../../shared/EmptyState';
-import { Chat } from './chat.model';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { ChatMessages } from './ChatMessages';
 import { ChatMessageBox } from './ChatMessageBox';
+import { Chat } from '@shared/models/chat.model';
 
 type Props = {
   chat: Chat | null;

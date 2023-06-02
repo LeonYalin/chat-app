@@ -7,7 +7,7 @@
     "start": "nx serve client",
     "start:server": "nx serve server",
     "start:all": "npm start && npm run start:server",
-    "test": "nx test client",
+    "test": " nx run-many -t test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache"
   },
   "dependencies": {

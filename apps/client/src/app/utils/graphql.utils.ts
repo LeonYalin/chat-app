@@ -5,7 +5,7 @@ let instance: ApolloClient<NormalizedCacheObject>;
 
 function initClient() {
   return new ApolloClient({
-    link: new HttpLink({ uri: 'https://flyby-router-demo.herokuapp.com/', fetch }),
+    link: new HttpLink({ uri: 'http://localhost:4000/', fetch }),
     cache: new InMemoryCache(),
   });
 }
