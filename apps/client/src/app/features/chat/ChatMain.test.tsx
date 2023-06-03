@@ -22,6 +22,30 @@ export const handlers = [
       }),
     );
   }),
+  graphql.mutation('DeteleChat', (req, res, ctx) => {
+    const mockChatId = '1';
+    return res(
+      ctx.data({
+        deleteChat: mockChatId,
+      }),
+    );
+  }),
+
+  graphql.mutation('ChangeChatName', (req, res, ctx) => {
+    const mockChat: Chat = {
+      id: '1',
+      name: 'test2',
+      avatarUrl: 'test',
+      messages: [],
+      participants: [],
+      createdAt: new Date().toISOString(),
+    };
+    return res(
+      ctx.data({
+        changeChatName: mockChat,
+      }),
+    );
+  }),
   graphql.query('LoadChats', (req, res, ctx) => {
     const mockChats: Chat[] = [
       {
@@ -107,6 +131,33 @@ it('should add a chat message to the store correctly', () => {
   });
 });
 
+it('should change a chat name in the store correctly', () => {
+  renderWithProviders(<ChatMain />, { store });
+
+  const addChatButton = screen.getByText('Add Chat');
+  fireEvent.click(addChatButton);
+
+  waitFor(() => {
+    expect(store.getState().chat.chats.length).toBe(1);
+
+    const changeNameBtn = screen.getByTestId('edit-chat-name-btn');
+    expect(changeNameBtn).toBeTruthy();
+    fireEvent.click(changeNameBtn as Element);
+
+    const input = screen.getByTestId('input-chat-name-edit');
+    expect(input).toBeTruthy();
+    fireEvent.input(input as Element, { target: { value: '123' } });
+    expect((input as HTMLInputElement).value).toEqual('123');
+
+    const confirmBtn = screen.queryByTestId('chat-name-confirm');
+    expect(confirmBtn).toBeTruthy();
+    fireEvent.click(confirmBtn as Element);
+
+    expect(store.getState().chat.chats.length).toBe(1);
+    expect(store.getState().chat.chats[0].name).toBe('123');
+  });
+});
+
 it('should delete a chat from the store correctly', () => {
   renderWithProviders(<ChatMain />, { store });
 
@@ -124,5 +175,6 @@ it('should delete a chat from the store correctly', () => {
     expect(confirmBtn).toBeTruthy();
     fireEvent.click(confirmBtn as Element);
     expect(store.getState().chat.chats.length).toBe(0);
+    expect(store.getState().chat.selectedChatId).toBeNull();
   });
 });

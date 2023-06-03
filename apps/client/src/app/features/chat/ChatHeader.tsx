@@ -32,7 +32,7 @@ export function ChatHeader(props: Props) {
                 <Avatar alt={props.chat?.avatarUrl} src="/static/images/avatar/1.jpg" />
               </ListItemAvatar>
               {props.chat?.name}
-              <IconButton data-testid="edit-btn" aria-label="Edit" ref={editBtnRef} onClick={() => setPopoverOpen(true)}>
+              <IconButton data-testid="edit-chat-name-btn" aria-label="Edit" ref={editBtnRef} onClick={() => setPopoverOpen(true)}>
                 <EditIcon />
               </IconButton>
               <Popover
@@ -46,7 +46,7 @@ export function ChatHeader(props: Props) {
               >
                 <Typography component={'div'} sx={{ p: 2 }}>
                   <TextField
-                    inputProps={{ 'data-testid': 'chat-name-edit' }}
+                    inputProps={{ 'data-testid': 'input-chat-name-edit' }}
                     value={chatNameForEdit}
                     onChange={e => setChatNameForEdit(e.target.value)}
                     label="Chat Name"

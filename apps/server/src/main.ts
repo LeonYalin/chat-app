@@ -1,6 +1,7 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { Chat } from '@shared/models/chat.model';
+import { Chat, createChatMessage } from '@shared/models/chat.model';
+import { GraphQLError } from 'graphql';
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -38,6 +39,11 @@ const typeDefs = `
     createdAt: String!
   }
 
+  type ChatMessageOutput {
+    chatId: String!
+    message: ChatMessage!
+  }
+
   type ChatUser {
     id: String!
     name: String!
@@ -56,6 +62,9 @@ const typeDefs = `
 
   type Mutation {
     addChat(chat: ChatInput!): Chat!
+    deleteChat(chatId: String!): String!
+    changeChatName(chatId: String!, newName: String!): Chat!
+    addChatMessage(chatId: String!, content: String!): ChatMessageOutput!
   }
 `;
 
@@ -69,11 +78,64 @@ const resolvers = {
   },
   Mutation: {
     addChat: (data, variables: { chat: Chat }) => {
-      const chat = variables.chat;
+      const { chat } = variables;
       if (chat) {
         chats.push(chat);
+        return chat;
+      } else {
+        throw new GraphQLError('Invalid argument value', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          },
+        });
       }
-      return chat;
+    },
+    deleteChat: (data, variables: { chatId: string }) => {
+      const { chatId } = variables;
+      if (chatId) {
+        chats.splice(
+          chats.findIndex(chat => chat.id === chatId),
+          1,
+        );
+        return chatId;
+      } else {
+        throw new GraphQLError('Invalid argument value', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          },
+        });
+      }
+    },
+    changeChatName: (data, variables: { chatId: string; newName: string }) => {
+      const { chatId, newName } = variables;
+      if (chatId && newName) {
+        const chat = chats.find(chat => chat.id === chatId);
+        if (chat) {
+          chat.name = newName;
+        }
+        return chat;
+      } else {
+        throw new GraphQLError('Invalid argument value', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          },
+        });
+      }
+    },
+    addChatMessage: (data, variables: { chatId: string; content: string }) => {
+      const { chatId, content } = variables;
+      const chat = chats.find(chat => chat.id === chatId);
+      if (chat && content) {
+        const message = createChatMessage({ content });
+        chat.messages.push(message);
+        return { chatId, message };
+      } else {
+        throw new GraphQLError('Invalid argument value', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          },
+        });
+      }
     },
   },
 };

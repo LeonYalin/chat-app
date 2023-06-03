@@ -99,7 +99,7 @@ it('should handle onChatMessage correctly', () => {
 
 it('should handle onChatNameChange correctly', () => {
   mockChat = createChat({ id: '1', name: 'test chat 1' });
-  const { baseElement } = renderWithProviders(
+  renderWithProviders(
     <ChatRoom
       chat={mockChat}
       panelWidth={mockPanelWidth}
@@ -109,11 +109,11 @@ it('should handle onChatNameChange correctly', () => {
     />,
   );
 
-  const editBtn = screen.getByTestId('edit-btn');
+  const editBtn = screen.getByTestId('edit-chat-name-btn');
   expect(editBtn).toBeTruthy();
   fireEvent.click(editBtn as Element);
 
-  const input = screen.getByTestId('chat-name-edit');
+  const input = screen.getByTestId('input-chat-name-edit');
   expect(input).toBeTruthy();
   fireEvent.input(input as Element, { target: { value: '123' } });
   expect((input as HTMLInputElement).value).toEqual('123');

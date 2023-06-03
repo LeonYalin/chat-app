@@ -37,7 +37,7 @@ it('should handle edit chat name correctly', () => {
   );
 
   // find edit button
-  const editBtn = screen.getByTestId('edit-btn');
+  const editBtn = screen.getByTestId('edit-chat-name-btn');
   expect(editBtn).toBeTruthy();
 
   // click edit button, open popover
@@ -45,7 +45,7 @@ it('should handle edit chat name correctly', () => {
   expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).toBeVisible();
 
   // find input, fill in new name
-  const input = screen.getByTestId('chat-name-edit');
+  const input = screen.getByTestId('input-chat-name-edit');
   expect(input).toBeTruthy();
   fireEvent.input(input as Element, { target: { value: '123' } });
   expect((input as HTMLInputElement).value).toEqual('123');
