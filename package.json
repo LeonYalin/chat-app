@@ -8,7 +8,8 @@
     "start:server": "nx serve server",
     "start:all": "npm start && npm run start:server",
     "test": " nx run-many -t test",
-    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache"
+    "test:client": " nx test client",
+    "test:server": " cross-env NODE_ENV=test nx test server"
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
@@ -22,6 +23,7 @@
     "cross-fetch": "^3.1.6",
     "express": "^4.18.1",
     "graphql": "^16.6.0",
+    "node-json-db": "^2.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
@@ -63,6 +65,7 @@
     "@typescript-eslint/parser": "^5.36.1",
     "babel-jest": "^29.4.1",
     "babel-plugin-styled-components": "1.10.7",
+    "cross-env": "^7.0.3",
     "cypress": "^12.2.0",
     "eslint": "~8.15.0",
     "eslint-config-prettier": "8.1.0",

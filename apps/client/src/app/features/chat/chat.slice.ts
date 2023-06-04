@@ -2,9 +2,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState, AppThunk } from '../../store';
 import { gql } from '@apollo/client';
-import gqlClient from '@client/utils/graphql.utils';
+import gqlClient from '@client/utils/graphql-client.utils';
 import { UIStatus } from '@client/utils/enums';
 import { ChatUser, createChat, Chat, ChatMessage } from '@shared/models/chat.model';
+import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
+import { LoadChatsQueryStr } from '@shared/graphql/queries';
 
 export interface ChatState {
   chats: Chat[];
@@ -20,65 +22,48 @@ const initialState: ChatState = {
   uiStatus: UIStatus.IDLE,
 };
 
-// The function below is called a thunk and allows us to perform async logic. It
-// can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
-// will call the thunk with the `dispatch` function as the first argument. Async
-// code can then be executed and other actions can be dispatched. Thunks are
-// typically used to make async requests.
 export const addChatAsync = createAsyncThunk('chat/addChatAsync', async () => {
-  const mutation = gql`
-    mutation AddChat($chat: ChatInput!) {
-      addChat(chat: $chat) {
-        ...ChatFields
-      }
-    }
-  `;
-  return gqlClient().mutate({ mutation, variables: { chat: createChat() } });
+  return gqlClient().mutate({
+    mutation: gql`
+      ${AddChatMutationStr}
+    `,
+    variables: { chat: createChat() },
+  });
 });
 
 export const deleteChatAsync = createAsyncThunk('chat/deleteChatAsync', async (payload: { chatId: string }) => {
-  const mutation = gql`
-    mutation DeleteChat($chatId: String!) {
-      deleteChat(chatId: $chatId)
-    }
-  `;
-  return gqlClient().mutate({ mutation, variables: { chatId: payload.chatId } });
+  return gqlClient().mutate({
+    mutation: gql`
+      ${DeleteChatMutationStr}
+    `,
+    variables: { chatId: payload.chatId },
+  });
 });
 
 export const changeChatNameAsync = createAsyncThunk('chat/changeChatNameAsync', async (payload: { chatId: string; newName: string }) => {
-  const mutation = gql`
-    mutation ChangeChatName($chatId: String!, $newName: String!) {
-      changeChatName(chatId: $chatId, newName: $newName) {
-        ...ChatFields
-      }
-    }
-  `;
-  return gqlClient().mutate({ mutation, variables: { chatId: payload.chatId, newName: payload.newName } });
+  return gqlClient().mutate({
+    mutation: gql`
+      ${ChangeChatNameMutationStr}
+    `,
+    variables: { chatId: payload.chatId, newName: payload.newName },
+  });
 });
 
 export const addChatMessageAsync = createAsyncThunk('chat/addChatMessageAsync', async (payload: { chatId: string; content: string }) => {
-  const mutation = gql`
-    mutation AddChatMessage($chatId: String!, $content: String!) {
-      addChatMessage(chatId: $chatId, content: $content) {
-        chatId
-        message {
-          ...ChatMessageFields
-        }
-      }
-    }
-  `;
-  return gqlClient().mutate({ mutation, variables: { chatId: payload.chatId, content: payload.content } });
+  return gqlClient().mutate({
+    mutation: gql`
+      ${AddChatMessageMutationStr}
+    `,
+    variables: { chatId: payload.chatId, content: payload.content },
+  });
 });
 
 export const loadChatsAsync = createAsyncThunk('chat/loadChatsAsync', async () => {
-  const query = gql`
-    query LoadChats {
-      chats {
-        ...ChatFields
-      }
-    }
-  `;
-  return gqlClient().query({ query });
+  return gqlClient().query({
+    query: gql`
+      ${LoadChatsQueryStr}
+    `,
+  });
 });
 
 export const chatSlice = createSlice({
