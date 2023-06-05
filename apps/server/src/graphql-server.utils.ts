@@ -59,6 +59,7 @@ export const typeDefs = `
 
   type Query {
     chats: [Chat!]!
+    loadChat(chatId: String!): Chat!
   }
 
   type Mutation {
@@ -74,10 +75,23 @@ export const resolvers = {
     chats: async () => {
       try {
         const chats: Chat[] = await db().getObjectDefault<Chat[]>('/chats', []);
-        console.log('chats', chats);
         return chats;
       } catch (err) {
         throwGqlError(err);
+      }
+    },
+    loadChat: async (data, variables: { chatId: string }) => {
+      const chats: Chat[] = await db().getObjectDefault<Chat[]>('/chats', []);
+      const { chatId } = variables;
+      if (chatId) {
+        const chat = chats.find(chat => chat.id === chatId);
+        if (!chat) {
+          throwGqlError('Chat not found');
+        } else {
+          return chat;
+        }
+      } else {
+        throwGqlError();
       }
     },
   },

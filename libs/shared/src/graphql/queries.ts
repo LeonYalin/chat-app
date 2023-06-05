@@ -5,3 +5,11 @@ query LoadChats {
     }
   }
 `;
+
+export const LoadChatQueryStr = `
+query LoadChat($chatId: String!) {
+    loadChat(chatId: $chatId) {
+    ...ChatFields
+    }
+  }
+`;

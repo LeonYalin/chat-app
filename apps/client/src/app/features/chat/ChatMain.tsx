@@ -10,6 +10,7 @@ import {
   deleteChatAsync,
   changeChatNameAsync,
   addChatMessageAsync,
+  loadChatAsync,
 } from './chat.slice';
 import { useEffect } from 'react';
 
@@ -26,7 +27,13 @@ export function ChatMain() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <ChatsPanel panelWidth={panelWidth} chats={chats} onAddChatClick={() => dispatch(addChatAsync())}></ChatsPanel>
+      <ChatsPanel
+        panelWidth={panelWidth}
+        chats={chats}
+        selectedChat={selectedChat}
+        onAddChatClick={() => dispatch(addChatAsync())}
+        onChatClick={chatId => dispatch(loadChatAsync({ chatId }))}
+      ></ChatsPanel>
       <ChatRoom
         panelWidth={panelWidth}
         chat={selectedChat}

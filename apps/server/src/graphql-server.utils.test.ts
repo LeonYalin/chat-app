@@ -3,7 +3,7 @@ import { createApolloTestingServer, getResponseData } from './graphql-server.uti
 import { Chat, ChatMessage } from '@shared/models/chat.model';
 import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr } from '@shared/graphql/fragments';
 import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
-import { LoadChatsQueryStr } from '@shared/graphql/queries';
+import { LoadChatQueryStr, LoadChatsQueryStr } from '@shared/graphql/queries';
 import db from './db.utils';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
@@ -15,6 +15,17 @@ async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
   const { data, errors } = getResponseData<{ addChat: Chat }>(response);
   expect(errors).toBeUndefined();
   expect(data.addChat).toEqual(mockChat);
+}
+
+async function testLoadChat(testServer: ApolloServer, mockChatId: string, { expected }: { expected: Chat }) {
+  const response = await testServer.executeOperation({
+    query: `${ChatFieldsFragmentStr}${LoadChatQueryStr}`,
+    variables: { chatId: mockChatId },
+  });
+
+  const { data, errors } = getResponseData<{ loadChat: Chat }>(response);
+  expect(errors).toBeUndefined();
+  expect(data.loadChat).toEqual(expected);
 }
 
 async function testAddChatMessage(testServer: ApolloServer, chatId: string, content: string) {
@@ -170,5 +181,21 @@ describe('Chats server tests', () => {
     await testAddChat(testServer, mockChat);
     await testLoadChats(testServer, { expected: [mockChat] });
     await testChangeChatName(testServer, mockChat.id, 'Chat Name Changed');
+  });
+
+  test('should load a chat correctly', async () => {
+    const testServer = createApolloTestingServer();
+    await testLoadChats(testServer, { expected: [] });
+
+    const mockChat = {
+      id: '234',
+      name: 'My Chat',
+      avatarUrl: 'https://example.com',
+      messages: [],
+      participants: [],
+      createdAt: new Date().toISOString(),
+    };
+    await testAddChat(testServer, mockChat);
+    await testLoadChat(testServer, mockChat.id, { expected: mockChat });
   });
 });

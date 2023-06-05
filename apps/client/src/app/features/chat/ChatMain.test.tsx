@@ -178,3 +178,21 @@ it('should delete a chat from the store correctly', () => {
     expect(store.getState().chat.selectedChatId).toBeNull();
   });
 });
+
+it('should load a selected chat from the store correctly', () => {
+  renderWithProviders(<ChatMain />, { store });
+
+  const addChatHeaderBtn = screen.getByTestId('add-chat-btn-header');
+  fireEvent.click(addChatHeaderBtn);
+  fireEvent.click(addChatHeaderBtn);
+
+  waitFor(() => {
+    expect(store.getState().chat.chats.length).toBe(2);
+    expect(store.getState().chat.selectedChatId).toEqual(store.getState().chat.chats[0].id);
+
+    const chatListItems = screen.getAllByTestId('chats-list-item');
+    expect(chatListItems).toHaveLength(2);
+    fireEvent.click(chatListItems.at(1) as Element);
+    expect(store.getState().chat.selectedChatId).toEqual(store.getState().chat.chats[1].id);
+  });
+});
