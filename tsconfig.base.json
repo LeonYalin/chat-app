@@ -18,14 +18,14 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": [
-        "libs/shared/src/*"
-      ],
       "@client/*": [
         "apps/client/src/app/*"
       ],
       "@server/*": [
         "apps/server/src/app/*"
+      ],
+      "@shared/*": [
+        "libs/shared/src/*"
       ]
     }
   },
