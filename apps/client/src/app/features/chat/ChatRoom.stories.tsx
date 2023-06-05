@@ -44,7 +44,6 @@ const messages: ChatMessage[] = [
 ];
 
 export const WithEmptyChat: Story = {
-  //   render: () => <ChatRoom chat={chat} panelWidth={300} onChatDelete={noop} onChatMessage={noop} onChatNameChange={noop} />,
   args: {
     chat: chat,
     panelWidth: 300,

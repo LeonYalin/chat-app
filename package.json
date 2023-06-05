@@ -1,5 +1,6 @@
 {
-  "name": "chat",
+  "name": "ly__chat",
+  "description": "The LY__Chat project",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
