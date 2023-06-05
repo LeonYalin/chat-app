@@ -4,12 +4,16 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "nx serve client",
+    "start": "npm run start:all",
+    "start:client": "nx serve client",
+    "start:storybook": "nx storybook client",
     "start:server": "nx serve server",
-    "start:all": "npm start && npm run start:server",
+    "start:all": "npm run start:client & npm run start:server",
     "test": " nx run-many -t test",
+    "test:all": "npm run test:client & npm run test:server",
     "test:client": " nx test client",
-    "test:server": " cross-env NODE_ENV=test nx test server"
+    "test:server": " cross-env NODE_ENV=test nx test server",
+    "build:client:storybook": "nx build-storybook client"
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
@@ -47,6 +51,9 @@
     "@nx/webpack": "16.3.2",
     "@nx/workspace": "16.3.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
+    "@storybook/addon-essentials": "^7.0.9",
+    "@storybook/core-server": "^7.0.9",
+    "@storybook/react-webpack5": "^7.0.9",
     "@svgr/webpack": "8.0.1",
     "@testing-library/dom": "^9.3.0",
     "@testing-library/jest-dom": "^5.16.5",
@@ -90,7 +97,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test"
+      "pre-commit": "npm run test:all"
     }
   }
 }

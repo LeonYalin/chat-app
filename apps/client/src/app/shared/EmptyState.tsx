@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import DataObjectIcon from '@mui/icons-material/DataObject';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 type Props = {
   icon?: JSX.Element;
@@ -26,7 +26,7 @@ const Message = styled.div`
 
 export function EmptyState(props: Props) {
   const [wrapperHeight, setWrapperHeight] = useState<number | null>(null);
-  const [icon, setIcon] = useState<JSX.Element | null>(<DataObjectIcon />);
+  const [icon, setIcon] = useState<JSX.Element | null>();
   const messages = props.messages || ['No data to display'];
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function EmptyState(props: Props) {
 
   return (
     <Wrapper style={props.style} height={wrapperHeight}>
-      <div>{icon}</div>
+      {props.icon ? icon : <CheckCircleOutlineIcon style={{ fontSize: '36px' }} />}
       {messages.map((message, i) => (
         <Message key={i}>{message}</Message>
       ))}

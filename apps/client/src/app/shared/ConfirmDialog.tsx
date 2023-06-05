@@ -10,9 +10,9 @@ export function ConfirmDialog(props: ConfirmDialogOptions) {
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-description"
     >
-      <DialogTitle data-testid="confirm-dialog-title">{props.title || ''}</DialogTitle>
+      <DialogTitle data-testid="confirm-dialog-title">{props.title || 'Dialog Title'}</DialogTitle>
       <DialogContent>
-        <DialogContentText data-testid="confirm-dialog-description">{props.content || ''}</DialogContentText>
+        <DialogContentText data-testid="confirm-dialog-description">{props.content || 'Dialog Content'}</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button data-testid="confirm-dialog-cancel-btn" onClick={props.onCancel}>
