@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ChatRoom } from './ChatRoom';
+import { ChatDetailsMain } from './ChatDetailsMain';
 import { noop } from '@client/utils/app.utils';
 import { Chat } from '@shared/models/chat.model';
 import { ChatMessage } from '@shared/models/chat.model';
 
 const meta = {
-  title: 'Chat Room',
-  component: ChatRoom,
-} satisfies Meta<typeof ChatRoom>;
+  title: 'Chat Details Main',
+  component: ChatDetailsMain,
+} satisfies Meta<typeof ChatDetailsMain>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

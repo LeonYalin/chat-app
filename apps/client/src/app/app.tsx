@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { ChatMain } from './features/chat/ChatMain';
 import { CssBaseline } from '@mui/material';
+import { ChatDetailsMain } from './features/chat/ChatDetailsMain';
 
 const StyledApp = styled.div`
   // Your style here
@@ -13,8 +14,11 @@ export function App() {
     <StyledApp>
       <CssBaseline />
       <Routes>
-        <Route path="/" element={<ChatMain />} />
-        <Route path="*" element={<ChatMain />} />
+        <Route path="/chats" element={<ChatMain />}>
+          <Route path=":chatId" element={<ChatDetailsMain />} />
+          <Route path="all" element={<ChatDetailsMain />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/chats/all" />} />
       </Routes>
     </StyledApp>
   );

@@ -5,6 +5,7 @@ import { AppStore, setupStore } from '@client/store';
 import { renderWithProviders } from '@client/utils/test-utils';
 import { graphql } from 'msw';
 import { Chat } from '@shared/models/chat.model';
+import { BrowserRouter } from 'react-router-dom';
 
 export const handlers = [
   graphql.mutation('AddChat', (req, res, ctx) => {
@@ -87,19 +88,42 @@ beforeEach(() => {
 });
 
 it('should render correctly', () => {
-  const { baseElement } = renderWithProviders(<ChatMain />);
+  const { baseElement } = renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+  );
   expect(baseElement).toBeTruthy();
 });
 
+it('should have correct width', () => {
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+  );
+  expect(screen.getByTestId('chat-room')).toHaveStyle('width: calc(100vw - 240px)');
+});
+
 it('should get chats from server correctly', () => {
-  renderWithProviders(<ChatMain />, { store });
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+    { store },
+  );
   waitFor(() => {
     expect(store.getState().chat.chats.length).toBe(2);
   });
 });
 
 it('should add a chat to the store correctly', () => {
-  renderWithProviders(<ChatMain />, { store });
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+    { store },
+  );
   const addChatButton = screen.getByText('Add Chat');
   fireEvent.click(addChatButton);
   waitFor(() => {
@@ -108,7 +132,12 @@ it('should add a chat to the store correctly', () => {
 });
 
 it('should add a chat message to the store correctly', () => {
-  renderWithProviders(<ChatMain />, { store });
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+    { store },
+  );
 
   const addChatButton = screen.getByText('Add Chat');
   fireEvent.click(addChatButton);
@@ -132,7 +161,12 @@ it('should add a chat message to the store correctly', () => {
 });
 
 it('should change a chat name in the store correctly', () => {
-  renderWithProviders(<ChatMain />, { store });
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+    { store },
+  );
 
   const addChatButton = screen.getByText('Add Chat');
   fireEvent.click(addChatButton);
@@ -159,7 +193,12 @@ it('should change a chat name in the store correctly', () => {
 });
 
 it('should delete a chat from the store correctly', () => {
-  renderWithProviders(<ChatMain />, { store });
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+    { store },
+  );
 
   const addChatButton = screen.getByText('Add Chat');
   fireEvent.click(addChatButton);
@@ -180,7 +219,12 @@ it('should delete a chat from the store correctly', () => {
 });
 
 it('should load a selected chat from the store correctly', () => {
-  renderWithProviders(<ChatMain />, { store });
+  renderWithProviders(
+    <BrowserRouter>
+      <ChatMain />
+    </BrowserRouter>,
+    { store },
+  );
 
   const addChatHeaderBtn = screen.getByTestId('add-chat-btn-header');
   fireEvent.click(addChatHeaderBtn);

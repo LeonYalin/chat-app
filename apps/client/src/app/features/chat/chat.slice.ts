@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState, AppThunk } from '../../store';
 import { gql } from '@apollo/client';
 import gqlClient from '@client/utils/graphql-client.utils';
-import { UIStatus } from '@client/utils/enums';
+import { UIState } from '@client/utils/enums';
 import { ChatUser, createChat, Chat, ChatMessage } from '@shared/models/chat.model';
 import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
 import { LoadChatQueryStr, LoadChatsQueryStr } from '@shared/graphql/queries';
@@ -12,14 +12,14 @@ export interface ChatState {
   chats: Chat[];
   selectedChatId: string | null;
   chatUsers: ChatUser[];
-  uiStatus: UIStatus;
+  uiState: UIState;
 }
 
 const initialState: ChatState = {
   chats: [],
   selectedChatId: null,
   chatUsers: [],
-  uiStatus: UIStatus.IDLE,
+  uiState: UIState.IDLE,
 };
 
 export const addChatAsync = createAsyncThunk('chat/addChatAsync', async () => {
@@ -68,12 +68,33 @@ export const addChatMessageAsync = createAsyncThunk('chat/addChatMessageAsync', 
 });
 
 export const loadChatsAsync = createAsyncThunk('chat/loadChatsAsync', async () => {
-  return gqlClient().query({
+  return gqlClient().query<{ chats: Chat[] }>({
     query: gql`
       ${LoadChatsQueryStr}
     `,
   });
 });
+
+/* Custom thunk example */
+// export const loadChatsAsync = (): AppThunk => (dispatch, getState) => {
+//   type LoadChatsResponse = { chats: Chat[] };
+//   const state = getState().chat;
+//   gqlClient()
+//     .query<LoadChatsResponse>({
+//       query: gql`
+//         ${LoadChatsQueryStr}
+//       `,
+//     })
+//     .then(res => {
+//       console.log('loadChatsAsync.fulfilled');
+//       const chats = res.data.chats;
+//       if (chats.length > 0) {
+//         // state.selectedChatId = chats[0].id;
+//         dispatch(setChats({ chats }));
+//         state.chats = chats;
+//       }
+//     });
+// };
 
 export const chatSlice = createSlice({
   name: 'chat',
@@ -86,6 +107,10 @@ export const chatSlice = createSlice({
       if (chat && participant) {
         chat.participants.push(participant);
       }
+    },
+    setSelectedChatId: (state, action: PayloadAction<{ selectedChatId: string | null }>) => {
+      const { selectedChatId } = action.payload;
+      state.selectedChatId = selectedChatId;
     },
   },
   // The `extraReducers` field lets the slice handle actions defined elsewhere,
@@ -102,10 +127,8 @@ export const chatSlice = createSlice({
         type LoadChatResponse = Chat;
         const loadedChat = action.payload.data.loadChat as LoadChatResponse;
         const index = state.chats.findIndex(chat => chat.id === loadedChat.id);
-        if (index > -1) {
-          state.chats[index] = loadedChat;
-          state.selectedChatId = loadedChat.id;
-        }
+        state.chats[index] = loadedChat;
+        state.selectedChatId = loadedChat.id;
       })
       .addCase(deleteChatAsync.fulfilled, (state, action) => {
         type DeleteChatResponse = string;
@@ -132,35 +155,33 @@ export const chatSlice = createSlice({
         }
       })
       .addCase(loadChatsAsync.fulfilled, (state, action) => {
-        type LoadChatsResponse = Chat[];
-        const chats = action.payload.data.chats as LoadChatsResponse;
+        const chats = action.payload.data.chats;
         if (chats.length > 0) {
-          state.selectedChatId = chats[0].id;
           state.chats = chats;
         }
       })
       .addMatcher(
         action => action.type.endsWith('/pending'),
         state => {
-          state.uiStatus = UIStatus.LOADING;
+          state.uiState = UIState.LOADING;
         },
       )
       .addMatcher(
         action => action.type.endsWith('/rejected'),
         state => {
-          state.uiStatus = UIStatus.FAILED;
+          state.uiState = UIState.FAILED;
         },
       )
       .addMatcher(
         action => action.type.endsWith('/fulfilled'),
         state => {
-          state.uiStatus = UIStatus.IDLE;
+          state.uiState = UIState.IDLE;
         },
       );
   },
 });
 
-export const { addParticipantToChat } = chatSlice.actions;
+export const { addParticipantToChat, setSelectedChatId } = chatSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
@@ -168,16 +189,6 @@ export const { addParticipantToChat } = chatSlice.actions;
 export const selectChatState = (state: RootState) => state.chat;
 export const selectChats = (state: RootState) => state.chat.chats;
 export const selectSelectedChat = (state: RootState) => state.chat.chats.find(chat => chat.id === state.chat.selectedChatId) || null;
-
-// We can also write thunks by hand, which may contain both sync and async logic.
-// Here's an example of conditionally dispatching actions based on current state.
-// export const incrementIfOdd =
-//   (amount: number): AppThunk =>
-//   (dispatch, getState) => {
-//     const currentValue = selectChatState(getState());
-//     if (currentValue % 2 === 1) {
-//       dispatch(incrementByAmount(amount));
-//     }
-//   };
+export const selectUIState = (state: RootState) => state.chat.uiState;
 
 export default chatSlice.reducer;

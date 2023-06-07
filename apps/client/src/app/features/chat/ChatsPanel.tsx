@@ -28,6 +28,7 @@ const LogoWrapper = styled.div`
   font-size: 18px;
   display: flex;
   flex-grow: 1;
+  cursor: pointer;
 `;
 
 const FaviconWrapper = styled.img`
@@ -42,6 +43,7 @@ type Props = {
   panelWidth: number;
   onAddChatClick: () => void;
   onChatClick: (chatId: string) => void;
+  onLogoClick: () => void;
 };
 
 const emptyStateMessages = ['There are no active chats.', 'Create a new chat to start messaging.'];
@@ -66,7 +68,7 @@ export function ChatsPanel(props: Props) {
     >
       <Toolbar>
         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <LogoWrapper>
+          <LogoWrapper data-testid="logo-wrapper" onClick={props.onLogoClick}>
             <FaviconWrapper src="favicon.ico" />
             <span>LY__Chat</span>
           </LogoWrapper>
