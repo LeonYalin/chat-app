@@ -58,7 +58,7 @@ export const typeDefs = `
   }
 
   type Query {
-    chats: [Chat!]!
+    loadAllChats: [Chat!]!
     loadChat(chatId: String!): Chat!
   }
 
@@ -72,7 +72,7 @@ export const typeDefs = `
 
 export const resolvers = {
   Query: {
-    chats: async () => {
+    loadAllChats: async () => {
       try {
         const chats: Chat[] = await db().getObjectDefault<Chat[]>('/chats', []);
         return chats;

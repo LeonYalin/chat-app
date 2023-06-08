@@ -1,12 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState, AppThunk } from '../../store';
-import { gql } from '@apollo/client';
-import gqlClient from '@client/utils/graphql-client.utils';
 import { UIState } from '@client/utils/enums';
-import { ChatUser, createChat, Chat, ChatMessage } from '@shared/models/chat.model';
-import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
-import { LoadChatQueryStr, LoadChatsQueryStr } from '@shared/graphql/queries';
+import { ChatUser, createChat, Chat } from '@shared/models/chat.model';
+import { addChatApi, addChatMessageApi, changeChatNameApi, deleteChatApi, loadAllChatsApi, loadChatApi } from './chat.api';
 
 export interface ChatState {
   chats: Chat[];
@@ -22,57 +19,28 @@ const initialState: ChatState = {
   uiState: UIState.IDLE,
 };
 
-export const addChatAsync = createAsyncThunk('chat/addChatAsync', async () => {
-  return gqlClient().mutate({
-    mutation: gql`
-      ${AddChatMutationStr}
-    `,
-    variables: { chat: createChat() },
-  });
+export const addChatAsync = createAsyncThunk('chat/addChatAsync', () => {
+  return addChatApi({ chat: createChat() });
 });
 
 export const loadChatAsync = createAsyncThunk('chat/loadChatAsync', async (payload: { chatId: string }) => {
-  return gqlClient().query({
-    query: gql`
-      ${LoadChatQueryStr}
-    `,
-    variables: { chatId: payload.chatId },
-  });
+  return loadChatApi({ chatId: payload.chatId });
 });
 
 export const deleteChatAsync = createAsyncThunk('chat/deleteChatAsync', async (payload: { chatId: string }) => {
-  return gqlClient().mutate({
-    mutation: gql`
-      ${DeleteChatMutationStr}
-    `,
-    variables: { chatId: payload.chatId },
-  });
+  return deleteChatApi({ chatId: payload.chatId });
 });
 
 export const changeChatNameAsync = createAsyncThunk('chat/changeChatNameAsync', async (payload: { chatId: string; newName: string }) => {
-  return gqlClient().mutate({
-    mutation: gql`
-      ${ChangeChatNameMutationStr}
-    `,
-    variables: { chatId: payload.chatId, newName: payload.newName },
-  });
+  return changeChatNameApi({ chatId: payload.chatId, newName: payload.newName });
 });
 
 export const addChatMessageAsync = createAsyncThunk('chat/addChatMessageAsync', async (payload: { chatId: string; content: string }) => {
-  return gqlClient().mutate({
-    mutation: gql`
-      ${AddChatMessageMutationStr}
-    `,
-    variables: { chatId: payload.chatId, content: payload.content },
-  });
+  return addChatMessageApi({ chatId: payload.chatId, content: payload.content });
 });
 
-export const loadChatsAsync = createAsyncThunk('chat/loadChatsAsync', async () => {
-  return gqlClient().query<{ chats: Chat[] }>({
-    query: gql`
-      ${LoadChatsQueryStr}
-    `,
-  });
+export const loadAllChatsAsync = createAsyncThunk('chat/loadChatsAsync', async () => {
+  return loadAllChatsApi();
 });
 
 /* Custom thunk example */
@@ -118,44 +86,46 @@ export const chatSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(addChatAsync.fulfilled, (state, action) => {
-        type AddChatResponse = Chat;
-        const addedChat = action.payload.data.addChat as AddChatResponse;
-        state.chats.push(addedChat);
-        state.selectedChatId = addedChat.id;
+        const addedChat = action.payload.data?.addChat;
+        if (addedChat) {
+          state.chats.push(addedChat);
+          state.selectedChatId = addedChat.id;
+        }
       })
       .addCase(loadChatAsync.fulfilled, (state, action) => {
-        type LoadChatResponse = Chat;
-        const loadedChat = action.payload.data.loadChat as LoadChatResponse;
+        const loadedChat = action.payload.data.loadChat;
         const index = state.chats.findIndex(chat => chat.id === loadedChat.id);
         state.chats[index] = loadedChat;
         state.selectedChatId = loadedChat.id;
       })
       .addCase(deleteChatAsync.fulfilled, (state, action) => {
-        type DeleteChatResponse = string;
-        const deletedChatId = action.payload.data.deleteChat as DeleteChatResponse;
+        const deletedChatId = action.payload.data?.deleteChat;
         if (deletedChatId) {
           state.chats = state.chats.filter(chat => chat.id !== deletedChatId);
           state.selectedChatId = state.chats.length ? state.chats[0].id : null;
         }
       })
       .addCase(changeChatNameAsync.fulfilled, (state, action) => {
-        type ChangeChatNameResponse = Chat;
-        const changedChat = action.payload.data.changeChatName as ChangeChatNameResponse;
-        const chat = state.chats.find(chat => chat.id === changedChat.id);
-        if (chat) {
-          chat.name = changedChat.name;
+        const changedChat = action.payload.data?.changeChatName;
+        if (changedChat) {
+          const chat = state.chats.find(chat => chat.id === changedChat.id);
+          if (chat) {
+            chat.name = changedChat.name;
+          }
         }
       })
       .addCase(addChatMessageAsync.fulfilled, (state, action) => {
-        type AddChatMessageResponse = { chatId: string; message: ChatMessage };
-        const { chatId, message } = action.payload.data.addChatMessage as AddChatMessageResponse;
-        const chat = state.chats.find(chat => chat.id === chatId);
-        if (chat) {
-          chat.messages.push(message);
+        const response = action.payload.data?.addChatMessage;
+        if (response) {
+          const { chatId, message } = response;
+          const chat = state.chats.find(chat => chat.id === chatId);
+          if (chat) {
+            chat.messages.push(message);
+          }
         }
       })
-      .addCase(loadChatsAsync.fulfilled, (state, action) => {
-        const chats = action.payload.data.chats;
+      .addCase(loadAllChatsAsync.fulfilled, (state, action) => {
+        const chats = action.payload.data.allChats;
         if (chats.length > 0) {
           state.chats = chats;
         }
@@ -183,9 +153,6 @@ export const chatSlice = createSlice({
 
 export const { addParticipantToChat, setSelectedChatId } = chatSlice.actions;
 
-// The function below is called a selector and allows us to select a value from
-// the state. Selectors can also be defined inline where they're used instead of
-// in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
 export const selectChatState = (state: RootState) => state.chat;
 export const selectChats = (state: RootState) => state.chat.chats;
 export const selectSelectedChat = (state: RootState) => state.chat.chats.find(chat => chat.id === state.chat.selectedChatId) || null;

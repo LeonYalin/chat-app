@@ -3,7 +3,7 @@ import { createApolloTestingServer, getResponseData } from './graphql-server.uti
 import { Chat, ChatMessage } from '@shared/models/chat.model';
 import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr } from '@shared/graphql/fragments';
 import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
-import { LoadChatQueryStr, LoadChatsQueryStr } from '@shared/graphql/queries';
+import { LoadChatQueryStr, LoadAllChatsQueryStr as LoadAllChatsQueryStr } from '@shared/graphql/queries';
 import db from './db.utils';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
@@ -63,15 +63,15 @@ async function testDeleteChat(testServer: ApolloServer, mockChat: Chat) {
   expect(data.deleteChat).toEqual(mockChat.id);
 }
 
-async function testLoadChats(testServer: ApolloServer, { expected }: { expected: Chat[] }) {
+async function testLoadAllChats(testServer: ApolloServer, { expected }: { expected: Chat[] }) {
   const response = await testServer.executeOperation({
-    query: `${ChatFieldsFragmentStr}${LoadChatsQueryStr}`,
+    query: `${ChatFieldsFragmentStr}${LoadAllChatsQueryStr}`,
     variables: {},
   });
 
-  const { data, errors } = getResponseData<{ chats: Chat[] }>(response);
+  const { data, errors } = getResponseData<{ loadAllChats: Chat[] }>(response);
   expect(errors).toBeUndefined();
-  expect(data.chats).toEqual(expected);
+  expect(data.loadAllChats).toEqual(expected);
 }
 
 describe('Chats server tests', () => {
@@ -86,7 +86,7 @@ describe('Chats server tests', () => {
 
   test('should add a chat correctly', async () => {
     const testServer = createApolloTestingServer();
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
 
     const mockChat = {
       id: '123',
@@ -98,12 +98,12 @@ describe('Chats server tests', () => {
     };
 
     await testAddChat(testServer, mockChat);
-    await testLoadChats(testServer, { expected: [mockChat] });
+    await testLoadAllChats(testServer, { expected: [mockChat] });
   });
 
   test('should delete a chat correctly', async () => {
     const testServer = createApolloTestingServer();
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
 
     const mockChat = {
       id: '234',
@@ -115,12 +115,12 @@ describe('Chats server tests', () => {
     };
     await testAddChat(testServer, mockChat);
     await testDeleteChat(testServer, mockChat);
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
   });
 
   test('should load chats correctly', async () => {
     const testServer = createApolloTestingServer();
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
 
     const mockChat = {
       id: '345',
@@ -132,7 +132,7 @@ describe('Chats server tests', () => {
     };
 
     await testAddChat(testServer, mockChat);
-    await testLoadChats(testServer, { expected: [mockChat] });
+    await testLoadAllChats(testServer, { expected: [mockChat] });
 
     const mockChat2 = {
       id: '456',
@@ -144,12 +144,12 @@ describe('Chats server tests', () => {
     };
 
     await testAddChat(testServer, mockChat2);
-    await testLoadChats(testServer, { expected: [mockChat, mockChat2] });
+    await testLoadAllChats(testServer, { expected: [mockChat, mockChat2] });
   });
 
   test('should add a chat messsage correctly', async () => {
     const testServer = createApolloTestingServer();
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
 
     const mockChat = {
       id: '567',
@@ -161,13 +161,13 @@ describe('Chats server tests', () => {
     };
 
     await testAddChat(testServer, mockChat);
-    await testLoadChats(testServer, { expected: [mockChat] });
+    await testLoadAllChats(testServer, { expected: [mockChat] });
     await testAddChatMessage(testServer, mockChat.id, 'Hello World');
   });
 
   test('should change a chat name correctly', async () => {
     const testServer = createApolloTestingServer();
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
 
     const mockChat = {
       id: '678',
@@ -179,13 +179,13 @@ describe('Chats server tests', () => {
     };
 
     await testAddChat(testServer, mockChat);
-    await testLoadChats(testServer, { expected: [mockChat] });
+    await testLoadAllChats(testServer, { expected: [mockChat] });
     await testChangeChatName(testServer, mockChat.id, 'Chat Name Changed');
   });
 
   test('should load a chat correctly', async () => {
     const testServer = createApolloTestingServer();
-    await testLoadChats(testServer, { expected: [] });
+    await testLoadAllChats(testServer, { expected: [] });
 
     const mockChat = {
       id: '234',

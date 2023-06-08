@@ -1,6 +1,6 @@
-export const LoadChatsQueryStr = `
-query LoadChats {
-    chats {
+export const LoadAllChatsQueryStr = `
+query LoadAllChats {
+    loadAllChats {
       ...ChatFields
     }
   }

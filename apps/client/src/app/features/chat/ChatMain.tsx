@@ -5,7 +5,7 @@ import {
   selectChats,
   selectSelectedChat,
   addChatAsync,
-  loadChatsAsync,
+  loadAllChatsAsync,
   setSelectedChatId,
   selectUIState,
 } from './chat.slice';
@@ -40,7 +40,7 @@ export function ChatMain() {
     // }
     // }
     // loadChats();
-    dispatch(loadChatsAsync());
+    dispatch(loadAllChatsAsync());
   }, [dispatch]);
 
   return (

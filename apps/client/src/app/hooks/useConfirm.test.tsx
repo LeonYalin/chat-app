@@ -1,11 +1,11 @@
 import { renderHook } from '@testing-library/react';
 import { ConfirmDialogProvider, useConfirm } from './useConfirm';
 import { act } from 'react-dom/test-utils';
-import { JSXElementConstructor, ReactElement } from 'react';
+import { JSXElementConstructor } from 'react';
 
 type WrapperEl =
   | JSXElementConstructor<{
-      children: ReactElement<any, string | JSXElementConstructor<any>>;
+      children: React.ReactNode;
     }>
   | undefined;
 
