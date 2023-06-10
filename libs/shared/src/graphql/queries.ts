@@ -13,3 +13,11 @@ query LoadChat($chatId: String!) {
     }
   }
 `;
+
+export const SignInQueryStr = `
+query SignIn($email: String!, $password: String!) {
+    signIn(email: $email, password: $password) {
+      ...UserFields
+    }
+  }
+`;

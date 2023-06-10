@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action, PreloadedState, combineReducers } from '@reduxjs/toolkit';
 
 import chatReducer from './features/chat/chat.slice';
+import authReducer from './features/auth/auth.slice';
 
 const rootReducer = combineReducers({
   chat: chatReducer,
+  auth: authReducer,
 });
 
 export function setupStore(preloadedState?: PreloadedState<RootState>) {

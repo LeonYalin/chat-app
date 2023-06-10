@@ -5,7 +5,7 @@ export interface Chat {
   name: string;
   avatarUrl: string;
   messages: ChatMessage[];
-  participants: ChatUser[];
+  participants: User[];
   createdAt: string;
 }
 
@@ -23,7 +23,7 @@ export function createChat(params: Partial<Chat> = {}) {
 export interface ChatMessage {
   id: string;
   content: string;
-  chatUserId: string;
+  userId: string;
   createdAt: string;
 }
 
@@ -31,13 +31,27 @@ export function createChatMessage(params: Partial<ChatMessage> = {}) {
   return {
     id: params.id ?? uuidv4(),
     content: params.content ?? '',
-    chatUserId: params.chatUserId ?? 'Me',
+    userId: params.userId ?? 'Me',
     createdAt: params.createdAt ?? new Date().toISOString(),
   } as ChatMessage;
 }
 
-export interface ChatUser {
+export interface User {
   id: string;
   name: string;
+  email: string;
+  password: string;
   avatarUrl: string;
+  createdAt: string;
+}
+
+export function createUser(params: Partial<User> = {}) {
+  return {
+    id: params.id ?? uuidv4(),
+    name: params.name ?? '',
+    avatarUrl: params.avatarUrl ?? '',
+    email: params.email ?? '',
+    password: params.password ?? '',
+    createdAt: params.createdAt ?? new Date().toISOString(),
+  } as User;
 }

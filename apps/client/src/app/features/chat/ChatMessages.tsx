@@ -11,9 +11,9 @@ export function ChatMessages(props: Props) {
       {props.messages.map(cm => (
         <ListItem data-testid="chat-message" alignItems="flex-start" key={cm.id}>
           <ListItemAvatar>
-            <Avatar alt={cm.chatUserId} src="/static/images/avatar/1.jpg" />
+            <Avatar alt={cm.userId} src="/static/images/avatar/1.jpg" />
           </ListItemAvatar>
-          <ListItemText primary={cm.chatUserId} secondary={cm.content} />
+          <ListItemText primary={cm.userId} secondary={cm.content} />
         </ListItem>
       ))}
     </List>

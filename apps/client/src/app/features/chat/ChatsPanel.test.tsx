@@ -11,6 +11,7 @@ let mockOnLogoClick: jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockChats.length = 0;
   mockPanelWidth = 0;
   mockOnAddChatClick = jest.fn(() => {
     /**/
@@ -27,6 +28,7 @@ it('should render correctly', () => {
   const { baseElement } = renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={null}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -41,6 +43,7 @@ it('should set widht of the panel correctly', () => {
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={null}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -54,6 +57,7 @@ it('should render the empty state icon and message if no chats provided', () => 
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={null}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -69,6 +73,7 @@ it('should handle add chat correctly from header', () => {
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={null}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -85,6 +90,7 @@ it('should handle add chat correctly from body', () => {
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={null}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -98,10 +104,11 @@ it('should handle add chat correctly from body', () => {
 });
 
 it('should render chats list correctly', () => {
-  mockChats.push(createChat({ id: '1', name: 'test chat 1' }));
+  mockChats.push(createChat({ name: 'test chat 1' }));
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={mockChats[0]}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -120,6 +127,7 @@ it('should click on chat correctly', () => {
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={mockChats[0]}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}
@@ -138,11 +146,43 @@ it('should click on chat correctly', () => {
   });
 });
 
+it('should set selected chat correctly', () => {
+  mockChats.push(createChat({ name: 'test chat 1' }), createChat({ name: 'test chat 2' }));
+  renderWithProviders(
+    <ChatsPanel
+      chats={mockChats}
+      selectedChat={null}
+      panelWidth={mockPanelWidth}
+      onChatClick={mockOnChatClick}
+      onAddChatClick={mockOnAddChatClick}
+      onLogoClick={mockOnLogoClick}
+    ></ChatsPanel>,
+  );
+
+  waitFor(() => {
+    const chatListItems = screen.getAllByTestId('chats-list-item');
+    expect(chatListItems).toHaveLength(2);
+    expect(chatListItems.at(0)).toHaveTextContent('test chat 1');
+    expect(chatListItems.at(1)).toHaveTextContent('test chat 2');
+    
+    expect(chatListItems.at(0)).not.toHaveClass('Mui-selected');
+    fireEvent.click(chatListItems.at(0) as HTMLElement);
+    expect(mockOnChatClick).toHaveBeenCalledWith(mockChats[0].id);
+    expect(chatListItems.at(0)).toHaveClass('Mui-selected');
+
+    expect(chatListItems.at(1)).not.toHaveClass('Mui-selected');
+    fireEvent.click(chatListItems.at(1) as HTMLElement);
+    expect(mockOnChatClick).toHaveBeenCalledWith(mockChats[1].id);
+    expect(chatListItems.at(1)).toHaveClass('Mui-selected');
+  });
+});
+
 it('should click on logo correctly', () => {
   mockChats.push(createChat({ id: '1', name: 'test chat 1' }));
   renderWithProviders(
     <ChatsPanel
       chats={mockChats}
+      selectedChat={null}
       panelWidth={mockPanelWidth}
       onChatClick={mockOnChatClick}
       onAddChatClick={mockOnAddChatClick}

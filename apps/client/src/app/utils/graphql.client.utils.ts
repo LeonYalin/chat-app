@@ -1,6 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, gql } from '@apollo/client';
 import { createFragmentRegistry } from '@apollo/client/cache';
-import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr } from '@shared/graphql/fragments';
+import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr, UserFieldsFragmentStr } from '@shared/graphql/fragments';
 import fetch from 'cross-fetch';
 
 let instance: ApolloClient<NormalizedCacheObject>;
@@ -11,6 +11,9 @@ const fragments = [
   `,
   gql`
     ${ChatMessageFieldsFragmentStr}
+  `,
+  gql`
+    ${UserFieldsFragmentStr}
   `,
 ];
 

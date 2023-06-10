@@ -47,7 +47,7 @@ export const handlers = [
       }),
     );
   }),
-  graphql.query('LoadChats', (req, res, ctx) => {
+  graphql.query('LoadAllChats', (req, res, ctx) => {
     const mockChats: Chat[] = [
       {
         id: '1',
@@ -68,7 +68,7 @@ export const handlers = [
     ];
     return res(
       ctx.data({
-        chats: mockChats,
+        loadAllChats: mockChats,
       }),
     );
   }),

@@ -1,10 +1,16 @@
 import { ApolloServer, GraphQLResponse } from '@apollo/server';
-import { createApolloTestingServer, getResponseData } from './graphql-server.utils';
-import { Chat, ChatMessage } from '@shared/models/chat.model';
-import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr } from '@shared/graphql/fragments';
-import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
-import { LoadChatQueryStr, LoadAllChatsQueryStr as LoadAllChatsQueryStr } from '@shared/graphql/queries';
-import db from './db.utils';
+import { createApolloTestingServer, getResponseData } from './graphql.server.utils';
+import { Chat, ChatMessage, User } from '@shared/models/chat.model';
+import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr, UserFieldsFragmentStr } from '@shared/graphql/fragments';
+import {
+  AddChatMessageMutationStr,
+  AddChatMutationStr,
+  ChangeChatNameMutationStr,
+  DeleteChatMutationStr,
+  SignUpMutationStr,
+} from '@shared/graphql/mutations';
+import { LoadChatQueryStr, LoadAllChatsQueryStr as LoadAllChatsQueryStr, SignInQueryStr } from '@shared/graphql/queries';
+import db from '../db.utils';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
   const response = await testServer.executeOperation<{ chat: Chat }>({
@@ -74,21 +80,64 @@ async function testLoadAllChats(testServer: ApolloServer, { expected }: { expect
   expect(data.loadAllChats).toEqual(expected);
 }
 
+async function testSignUp(
+  testServer: ApolloServer,
+  { name, email, password, attempt }: { name: string; email: string; password: string; attempt: number },
+) {
+  const response = await testServer.executeOperation({
+    query: `${UserFieldsFragmentStr}${SignUpMutationStr}`,
+    variables: { name, email, password },
+  });
+
+  const { data, errors } = getResponseData<{ signUp: User }>(response);
+  if (attempt === 1) {
+    expect(errors).toBeUndefined();
+    expect(data.signUp.name).toEqual(name);
+    expect(data.signUp.email).toEqual(email);
+    expect(data.signUp.password).toEqual(password);
+  } else {
+    expect(errors).toBeDefined();
+    expect(errors[0].message).toEqual('Email already exists');
+  }
+}
+
+async function testSignIn(testServer: ApolloServer, { email, password, valid }: { email: string; password: string; valid: boolean }) {
+  const response = await testServer.executeOperation({
+    query: `${UserFieldsFragmentStr}${SignInQueryStr}`,
+    variables: { email, password },
+  });
+
+  const { data, errors } = getResponseData<{ signIn: User }>(response);
+  if (valid) {
+    expect(errors).toBeUndefined();
+    expect(data.signIn.email).toEqual(email);
+    expect(data.signIn.password).toEqual(password);
+  } else {
+    expect(errors).toBeDefined();
+    expect(errors[0].message).toEqual('User not found');
+  }
+}
+
+async function clearDbData() {
+  await db().delete('/chats');
+  await db().delete('/users');
+}
+
 describe('Chats server tests', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
-    await db().delete('/chats');
+    await clearDbData();
   });
 
   afterAll(async () => {
-    await db().delete('/chats');
+    await clearDbData();
   });
 
   test('should add a chat correctly', async () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
-    const mockChat = {
+    const mockChat: Chat = {
       id: '123',
       name: 'My Chat',
       avatarUrl: 'https://example.com',
@@ -105,7 +154,7 @@ describe('Chats server tests', () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
-    const mockChat = {
+    const mockChat: Chat = {
       id: '234',
       name: 'My Chat',
       avatarUrl: 'https://example.com',
@@ -122,7 +171,7 @@ describe('Chats server tests', () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
-    const mockChat = {
+    const mockChat: Chat = {
       id: '345',
       name: 'My Chat',
       avatarUrl: 'https://example.com',
@@ -134,7 +183,7 @@ describe('Chats server tests', () => {
     await testAddChat(testServer, mockChat);
     await testLoadAllChats(testServer, { expected: [mockChat] });
 
-    const mockChat2 = {
+    const mockChat2: Chat = {
       id: '456',
       name: 'My Chat 2',
       avatarUrl: 'https://example.com2',
@@ -151,7 +200,7 @@ describe('Chats server tests', () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
-    const mockChat = {
+    const mockChat: Chat = {
       id: '567',
       name: 'My Chat',
       avatarUrl: 'https://example.com',
@@ -169,7 +218,7 @@ describe('Chats server tests', () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
-    const mockChat = {
+    const mockChat: Chat = {
       id: '678',
       name: 'My Chat',
       avatarUrl: 'https://example.com',
@@ -187,7 +236,7 @@ describe('Chats server tests', () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
-    const mockChat = {
+    const mockChat: Chat = {
       id: '234',
       name: 'My Chat',
       avatarUrl: 'https://example.com',
@@ -197,5 +246,42 @@ describe('Chats server tests', () => {
     };
     await testAddChat(testServer, mockChat);
     await testLoadChat(testServer, mockChat.id, { expected: mockChat });
+  });
+
+  test('should sign user up correctly', async () => {
+    const testServer = createApolloTestingServer();
+
+    const mockSignUpData: { name: string; email: string; password: string; attempt: number } = {
+      name: 'My User',
+      email: 'blabla@gmail.com',
+      password: '123456',
+      attempt: 1,
+    };
+    await testSignUp(testServer, mockSignUpData);
+    await testSignUp(testServer, { ...mockSignUpData, attempt: 2 });
+  });
+
+  test('should sign user in correctly', async () => {
+    const testServer = createApolloTestingServer();
+
+    const mockSignInValidData: { email: string; password: string; valid: boolean } = {
+      email: 'blabla@gmail.com',
+      password: '123456',
+      valid: true,
+    };
+    const mockSignInInvalidData: { email: string; password: string; valid: boolean } = {
+      email: 'invalid@email.com',
+      password: '000000',
+      valid: false,
+    };
+    const mockSignUpData: { name: string; email: string; password: string; attempt: number } = {
+      email: 'blabla@gmail.com',
+      password: '123456',
+      name: 'My User',
+      attempt: 1,
+    };
+    await testSignUp(testServer, mockSignUpData);
+    await testSignIn(testServer, mockSignInValidData);
+    await testSignIn(testServer, mockSignInInvalidData);
   });
 });

@@ -1,5 +1,5 @@
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { createApolloTestingServer } from './graphql-server.utils';
+import { createApolloTestingServer } from './graphql/graphql.server.utils';
 
 
 // Passing an ApolloServer instance to the `startStandaloneServer` function:

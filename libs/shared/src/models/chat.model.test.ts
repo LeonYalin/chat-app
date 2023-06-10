@@ -38,7 +38,7 @@ it('should create an empty chat message correctly', () => {
   expect(chatMessage).toEqual({
     id: expect.any(String),
     content: '',
-    chatUserId: 'Me',
+    userId: 'Me',
     createdAt: expect.any(String),
   });
 });
@@ -47,13 +47,13 @@ it('should create a chat message with data correctly', () => {
   const chatMessage = createChatMessage({
     id: '123',
     content: 'Hello',
-    chatUserId: '123',
+    userId: '123',
     createdAt: now,
   });
   expect(chatMessage).toEqual({
     id: '123',
     content: 'Hello',
-    chatUserId: '123',
+    userId: '123',
     createdAt: now,
   });
 });

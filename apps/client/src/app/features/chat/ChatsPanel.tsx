@@ -10,13 +10,13 @@ import {
   Button,
   IconButton,
   Box,
+  Avatar,
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import { EmptyState } from '../../shared/EmptyState';
 import styled from 'styled-components';
 import { useRef } from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Chat } from '@shared/models/chat.model';
 
 const ListWrapper = styled.div`
@@ -95,7 +95,9 @@ export function ChatsPanel(props: Props) {
                 onClick={() => props.onChatClick(chat.id)}
               >
                 <ListItemButton>
-                  <ListItemIcon>{<AccountCircleIcon />}</ListItemIcon>
+                  <ListItemIcon>
+                    <Avatar alt={chat.name} sx={{ width: 28, height: 28 }} src="/static/images/avatar/1.jpg" />
+                  </ListItemIcon>
                   <ListItemText primary={chat.name} />
                 </ListItemButton>
               </ListItem>

@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import gqlClient from '@client/utils/graphql-client.utils';
+import gqlClient from '@client/utils/graphql.client.utils';
 import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
 import { LoadAllChatsQueryStr } from '@shared/graphql/queries';
 import { LoadChatQueryStr } from '@shared/graphql/queries';
@@ -51,7 +51,7 @@ export function addChatMessageApi({ chatId, content }: { chatId: string; content
 }
 
 export function loadAllChatsApi() {
-  return gqlClient().query<{ allChats: Chat[] }>({
+  return gqlClient().query<{ loadAllChats: Chat[] }>({
     query: gql`
       ${LoadAllChatsQueryStr}
     `,

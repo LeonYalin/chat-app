@@ -30,3 +30,11 @@ mutation AddChatMessage($chatId: String!, $content: String!) {
     }
   }
 `;
+
+export const SignUpMutationStr = `
+mutation SignUp($name: String!, $email: String!, $password: String!) {
+    signUp(name: $name, email: $email, password: $password) {
+      ...UserFields
+    }
+  }
+`;

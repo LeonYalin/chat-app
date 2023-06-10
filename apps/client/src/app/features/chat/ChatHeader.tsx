@@ -25,11 +25,11 @@ export function ChatHeader(props: Props) {
   return (
     <>
       <Toolbar sx={{ marginLeft: '7px' }}>
-        {props.chat ? (
-          <>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+          {props.chat ? (
+            <>
               <ListItemAvatar>
-                <Avatar alt={props.chat?.avatarUrl} src="/static/images/avatar/1.jpg" />
+                <Avatar alt={props.chat.name} src="/static/images/avatar/1.jpg" />
               </ListItemAvatar>
               {props.chat?.name}
               <IconButton data-testid="edit-chat-name-btn" aria-label="Edit" ref={editBtnRef} onClick={() => setPopoverOpen(true)}>
@@ -69,8 +69,6 @@ export function ChatHeader(props: Props) {
                   </Typography>
                 </Typography>
               </Popover>
-            </Box>
-            <Box sx={{ flexGrow: 0 }}>
               <IconButton
                 data-testid="delete-btn"
                 aria-label="Delete"
@@ -93,9 +91,12 @@ export function ChatHeader(props: Props) {
               >
                 <DeleteIcon />
               </IconButton>
-            </Box>
-          </>
-        ) : null}
+            </>
+          ) : null}
+        </Box>
+        <Box sx={{ flexGrow: 0, cursor: 'pointer' }} onClick={() => alert(111)}>
+          <Avatar alt={''} src="/static/images/avatar/1.jpg" />
+        </Box>
       </Toolbar>
       <Divider />
     </>
