@@ -152,7 +152,7 @@ export function SignUp() {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="#" variant="body2" data-testid="signup-signin-link">
+              <Link component="span" onClick={() => navigate('/signin')} variant="body2" data-testid="signup-signin-link">
                 Already have an account? Sign in
               </Link>
             </Grid>

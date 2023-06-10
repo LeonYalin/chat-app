@@ -115,9 +115,7 @@ it('should render empty state when no chats selected', () => {
   const { baseElement } = renderWithProviders(<ChatDetailsMain />);
   expect(baseElement).toBeTruthy();
 
-  waitFor(() => {
-    expect(screen.getByTestId('Select a chat to start messaging')).toBeTruthy();
-  });
+  expect(screen.getByText('Select a chat to start messaging')).toBeTruthy();
 });
 
 it('should handle onChatDelete correctly', () => {

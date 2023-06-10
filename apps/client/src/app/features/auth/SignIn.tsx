@@ -27,7 +27,11 @@ export function SignIn() {
 
   const [error, setError] = React.useState<string>('');
 
-  const { control, handleSubmit } = useForm<IFormInput>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormInput>({
     defaultValues: {
       email: '',
       password: '',
@@ -71,6 +75,9 @@ export function SignIn() {
                 label="Email Address"
                 autoComplete="email"
                 autoFocus
+                inputProps={{ 'data-testid': 'signin-input-email' }}
+                error={!!errors.email}
+                helperText={errors.email && 'Email is required'}
               />
             )}
           />
@@ -88,6 +95,9 @@ export function SignIn() {
                 type="password"
                 id="password"
                 autoComplete="password"
+                inputProps={{ 'data-testid': 'signin-input-password' }}
+                error={!!errors.password}
+                helperText={errors.password && 'Password is required'}
               />
             )}
           />
@@ -95,10 +105,20 @@ export function SignIn() {
             name="rememberMe"
             control={control}
             render={({ field }) => (
-              <FormControlLabel {...field} control={<Checkbox value="remember" color="primary" />} label="Remember me" />
+              <FormControlLabel
+                {...field}
+                control={
+                  <Checkbox
+                    value="remember"
+                    color="primary"
+                    inputProps={{ 'data-testid': 'signin-input-rememberme' } as React.InputHTMLAttributes<HTMLInputElement>}
+                  />
+                }
+                label="Remember me"
+              />
             )}
           />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} data-testid="signin-submit-btn">
             Sign In
           </Button>
           <Grid container>
@@ -108,7 +128,7 @@ export function SignIn() {
               </Link> */}
             </Grid>
             <Grid item>
-              <Link href="/signup" variant="body2">
+              <Link component="span" onClick={() => navigate('/signup')} variant="body2" data-testid="signin-signup-link">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

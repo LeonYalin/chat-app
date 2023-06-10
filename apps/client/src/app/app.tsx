@@ -9,7 +9,7 @@ import { SignIn } from './features/auth/SignIn';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { User } from '@shared/models/chat.model';
 import { setUser } from './features/auth/auth.slice';
-import { SignUp } from './features/auth/SignUp1';
+import { SignUp } from './features/auth/SignUp';
 
 const StyledApp = styled.div`
   // Your style here
