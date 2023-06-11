@@ -2,6 +2,7 @@ import { Chat, createChatMessage } from '@shared/models/chat.model';
 import db from '../db.utils';
 import { throwGqlDefaultError, throwGqlError } from './graphql.server.utils';
 import { User, createUser } from '@shared/models/user.model';
+import { comparePasswordAndHash, hashPassword } from '../crypto.utils';
 
 export const resolvers = {
   Query: {
@@ -34,9 +35,16 @@ export const resolvers = {
     signIn: async (data, variables: { email: string; password: string }) => {
       try {
         const users: User[] = await db().getObjectDefault<User[]>('/users', []);
-        const validUser = users.find(user => user.email === variables.email && user.password === variables.password);
+        const validUser = users.find(user => user.email === variables.email);
         if (validUser) {
-          return validUser;
+          const validPassword = await comparePasswordAndHash(variables.password, validUser.password).catch(err => {
+            throwGqlDefaultError(err);
+          });
+          if (validPassword) {
+            return validUser;
+          } else {
+            throwGqlError('Invalid password');
+          }
         } else {
           throwGqlError('User not found');
         }
@@ -120,7 +128,10 @@ export const resolvers = {
         if (user) {
           throwGqlError('Email already exists');
         } else {
-          const newUser = createUser({ name: variables.name, email: variables.email, password: variables.password });
+          const hashedPassword = await hashPassword(variables.password).catch(err => {
+            throwGqlDefaultError(err);
+          });
+          const newUser = createUser({ name: variables.name, email: variables.email, password: hashedPassword || '' });
           await db().push('/users[]', newUser);
           return newUser;
         }

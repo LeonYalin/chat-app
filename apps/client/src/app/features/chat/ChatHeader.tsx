@@ -116,7 +116,7 @@ export function ChatHeader(props: Props) {
           ) : null}
         </Box>
         <Box sx={{ flexGrow: 0, cursor: 'pointer' }} onClick={() => setUserMenuPopoverOpen(true)} data-testid="user-menu-icon">
-          <Avatar alt={''} src="/static/images/avatar/1.jpg" ref={userMenuIconRef} />
+          <Avatar alt={''} src="/static/images/avatar/1.jpg" ref={userMenuIconRef} sx={{ bgcolor: '#9c27b0' }} />
         </Box>
         <Popover
           open={userMenuPopoverOpen}

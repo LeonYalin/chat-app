@@ -13,6 +13,7 @@ import {
 import { LoadChatQueryStr, LoadAllChatsQueryStr as LoadAllChatsQueryStr, SignInQueryStr } from '@shared/graphql/queries';
 import db from '../db.utils';
 import { User } from '@shared/models/user.model';
+import { comparePasswordAndHash, hashPassword } from '../crypto.utils';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
   const response = await testServer.executeOperation<{ chat: Chat }>({
@@ -96,7 +97,11 @@ async function testSignUp(
     expect(errors).toBeUndefined();
     expect(data.signUp.name).toEqual(name);
     expect(data.signUp.email).toEqual(email);
-    expect(data.signUp.password).toEqual(password);
+
+    const validPassword = await comparePasswordAndHash(password, data.signUp.password).catch(err => {
+      throw new Error(err);
+    });
+    expect(validPassword).toBeTruthy();
   } else {
     expect(errors).toBeDefined();
     expect(errors[0].message).toEqual('Email already exists');
@@ -113,7 +118,11 @@ async function testSignIn(testServer: ApolloServer, { email, password, valid }: 
   if (valid) {
     expect(errors).toBeUndefined();
     expect(data.signIn.email).toEqual(email);
-    expect(data.signIn.password).toEqual(password);
+
+    const validPassword = await comparePasswordAndHash(password, data.signIn.password).catch(err => {
+      throw new Error(err);
+    });
+    expect(validPassword).toBeTruthy();
   } else {
     expect(errors).toBeDefined();
     expect(errors[0].message).toEqual('User not found');
@@ -270,6 +279,7 @@ describe('Chats server tests', () => {
       password: '123456',
       attempt: 1,
     };
+
     await testSignUp(testServer, mockSignUpData);
     await testSignUp(testServer, { ...mockSignUpData, attempt: 2 });
   });
@@ -282,6 +292,7 @@ describe('Chats server tests', () => {
       password: '123456',
       valid: true,
     };
+
     const mockSignInInvalidData: { email: string; password: string; valid: boolean } = {
       email: 'invalid@email.com',
       password: '000000',
@@ -309,6 +320,10 @@ describe('Chats server tests', () => {
       avatarUrl: 'https://example.com',
       createdAt: new Date().toISOString(),
     };
+    const hashedPassword = await hashPassword(mockUser.password).catch(err => {
+      throw new Error(err);
+    });
+    mockUser.password = hashedPassword;
 
     await testSignUp(testServer, { ...mockUser, attempt: 1 });
     await testSignIn(testServer, { ...mockUser, valid: true });
