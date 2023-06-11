@@ -39,6 +39,7 @@ export function EmptyState(props: Props) {
     if (props.icon) {
       const cloned = React.cloneElement(props.icon, {
         style: { fontSize: '36px' },
+        color: 'secondary',
       });
       setIcon(cloned);
     }

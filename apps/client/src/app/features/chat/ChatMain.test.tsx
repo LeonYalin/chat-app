@@ -5,7 +5,7 @@ import { AppStore, setupStore } from '@client/store';
 import { renderWithProviders } from '@client/utils/test-utils';
 import { graphql } from 'msw';
 import { Chat } from '@shared/models/chat.model';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 export const handlers = [
   graphql.mutation('AddChat', (req, res, ctx) => {
@@ -89,27 +89,29 @@ beforeEach(() => {
 
 it('should render correctly', () => {
   const { baseElement } = renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
+    { store },
   );
   expect(baseElement).toBeTruthy();
 });
 
 it('should have correct width', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
+    { store },
   );
   expect(screen.getByTestId('chat-room')).toHaveStyle('width: calc(100vw - 240px)');
 });
 
 it('should get chats from server correctly', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
     { store },
   );
   waitFor(() => {
@@ -119,9 +121,9 @@ it('should get chats from server correctly', () => {
 
 it('should add a chat to the store correctly', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
     { store },
   );
   const addChatButton = screen.getByText('Add Chat');
@@ -133,9 +135,9 @@ it('should add a chat to the store correctly', () => {
 
 it('should add a chat message to the store correctly', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
     { store },
   );
 
@@ -162,9 +164,9 @@ it('should add a chat message to the store correctly', () => {
 
 it('should change a chat name in the store correctly', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
     { store },
   );
 
@@ -194,9 +196,9 @@ it('should change a chat name in the store correctly', () => {
 
 it('should delete a chat from the store correctly', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
     { store },
   );
 
@@ -220,9 +222,9 @@ it('should delete a chat from the store correctly', () => {
 
 it('should load a selected chat from the store correctly', () => {
   renderWithProviders(
-    <BrowserRouter>
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
       <ChatMain />
-    </BrowserRouter>,
+    </MemoryRouter>,
     { store },
   );
 

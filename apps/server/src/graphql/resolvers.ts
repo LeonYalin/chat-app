@@ -1,6 +1,7 @@
-import { Chat, User, createChatMessage, createUser } from '@shared/models/chat.model';
+import { Chat, createChatMessage } from '@shared/models/chat.model';
 import db from '../db.utils';
 import { throwGqlDefaultError, throwGqlError } from './graphql.server.utils';
+import { User, createUser } from '@shared/models/user.model';
 
 export const resolvers = {
   Query: {
@@ -122,6 +123,25 @@ export const resolvers = {
           const newUser = createUser({ name: variables.name, email: variables.email, password: variables.password });
           await db().push('/users[]', newUser);
           return newUser;
+        }
+      } catch (err) {
+        throwGqlDefaultError(err);
+      }
+    },
+    deleteUser: async (data, variables: { userEmail: string }) => {
+      try {
+        const users: User[] = await db().getObjectDefault<User[]>('/users', []);
+        const { userEmail } = variables;
+        if (userEmail) {
+          const index = users.findIndex(chat => chat.email === userEmail);
+          if (index === -1) {
+            throwGqlError('User not found');
+          } else {
+            await db().delete(`/users[${index}]`);
+            return userEmail;
+          }
+        } else {
+          throwGqlError();
         }
       } catch (err) {
         throwGqlDefaultError(err);

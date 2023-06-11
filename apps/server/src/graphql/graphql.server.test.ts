@@ -1,16 +1,18 @@
 import { ApolloServer, GraphQLResponse } from '@apollo/server';
 import { createApolloTestingServer, getResponseData } from './graphql.server.utils';
-import { Chat, ChatMessage, User } from '@shared/models/chat.model';
+import { Chat, ChatMessage } from '@shared/models/chat.model';
 import { ChatFieldsFragmentStr, ChatMessageFieldsFragmentStr, UserFieldsFragmentStr } from '@shared/graphql/fragments';
 import {
   AddChatMessageMutationStr,
   AddChatMutationStr,
   ChangeChatNameMutationStr,
   DeleteChatMutationStr,
+  DeleteUserMutationStr,
   SignUpMutationStr,
 } from '@shared/graphql/mutations';
 import { LoadChatQueryStr, LoadAllChatsQueryStr as LoadAllChatsQueryStr, SignInQueryStr } from '@shared/graphql/queries';
 import db from '../db.utils';
+import { User } from '@shared/models/user.model';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
   const response = await testServer.executeOperation<{ chat: Chat }>({
@@ -58,15 +60,15 @@ async function testChangeChatName(testServer: ApolloServer, chatId: string, newN
   expect(data.changeChatName.name).toEqual(newName);
 }
 
-async function testDeleteChat(testServer: ApolloServer, mockChat: Chat) {
+async function testDeleteChat(testServer: ApolloServer, mockChatId: string) {
   const response = await testServer.executeOperation<{ chatId: string }>({
     query: `${DeleteChatMutationStr}`,
-    variables: { chatId: mockChat.id },
+    variables: { chatId: mockChatId },
   });
 
   const { data, errors } = getResponseData<{ deleteChat: string }>(response);
   expect(errors).toBeUndefined();
-  expect(data.deleteChat).toEqual(mockChat.id);
+  expect(data.deleteChat).toEqual(mockChatId);
 }
 
 async function testLoadAllChats(testServer: ApolloServer, { expected }: { expected: Chat[] }) {
@@ -118,6 +120,17 @@ async function testSignIn(testServer: ApolloServer, { email, password, valid }: 
   }
 }
 
+async function testDeleteUser(testServer: ApolloServer, mockUserEmail: string) {
+  const response = await testServer.executeOperation<{ userEmail: string }>({
+    query: `${DeleteUserMutationStr}`,
+    variables: { userEmail: mockUserEmail },
+  });
+
+  const { data, errors } = getResponseData<{ deleteUser: string }>(response);
+  expect(errors).toBeUndefined();
+  expect(data.deleteUser).toEqual(mockUserEmail);
+}
+
 async function clearDbData() {
   await db().delete('/chats');
   await db().delete('/users');
@@ -163,7 +176,7 @@ describe('Chats server tests', () => {
       createdAt: new Date().toISOString(),
     };
     await testAddChat(testServer, mockChat);
-    await testDeleteChat(testServer, mockChat);
+    await testDeleteChat(testServer, mockChat.id);
     await testLoadAllChats(testServer, { expected: [] });
   });
 
@@ -283,5 +296,23 @@ describe('Chats server tests', () => {
     await testSignUp(testServer, mockSignUpData);
     await testSignIn(testServer, mockSignInValidData);
     await testSignIn(testServer, mockSignInInvalidData);
+  });
+
+  test('should delete a user correctly', async () => {
+    const testServer = createApolloTestingServer();
+
+    const mockUser: User = {
+      id: '123',
+      name: 'My User',
+      email: 'testemail@gmail.com',
+      password: 'testpassword',
+      avatarUrl: 'https://example.com',
+      createdAt: new Date().toISOString(),
+    };
+
+    await testSignUp(testServer, { ...mockUser, attempt: 1 });
+    await testSignIn(testServer, { ...mockUser, valid: true });
+    await testDeleteUser(testServer, mockUser.email);
+    await testSignIn(testServer, { ...mockUser, valid: false });
   });
 });

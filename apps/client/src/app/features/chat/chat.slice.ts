@@ -2,8 +2,9 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState, AppThunk } from '../../store';
 import { UIState } from '@client/utils/enums';
-import { User, createChat, Chat } from '@shared/models/chat.model';
+import { createChat, Chat } from '@shared/models/chat.model';
 import { addChatApi, addChatMessageApi, changeChatNameApi, deleteChatApi, loadAllChatsApi, loadChatApi } from './chat.api';
+import { User } from '@shared/models/user.model';
 
 export interface ChatState {
   chats: Chat[];
@@ -54,7 +55,7 @@ export const loadAllChatsAsync = (): AppThunk => (dispatch, getState) => {
       }
     })
     .catch(err => {
-      // setError(err.message);
+      console.log(err);
     });
 };
 

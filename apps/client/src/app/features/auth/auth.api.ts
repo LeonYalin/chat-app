@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 import gqlClient from '@client/utils/graphql.client.utils';
-import { SignUpMutationStr } from '@shared/graphql/mutations';
+import { DeleteUserMutationStr, SignUpMutationStr } from '@shared/graphql/mutations';
 import { SignInQueryStr } from '@shared/graphql/queries';
-import { User } from '@shared/models/chat.model';
+import { User } from '@shared/models/user.model';
 
 export function signUpApi({ name, email, password }: { name: string; email: string; password: string }) {
   return gqlClient().mutate<{ signUp: User }>({
@@ -19,5 +19,14 @@ export function signInApi({ email, password }: { email: string; password: string
       ${SignInQueryStr}
     `,
     variables: { email, password },
+  });
+}
+
+export function deleteUserApi({ userEmail }: { userEmail: string }) {
+  return gqlClient().mutate<{ deleteUser: string }>({
+    mutation: gql`
+      ${DeleteUserMutationStr}
+    `,
+    variables: { userEmail },
   });
 }

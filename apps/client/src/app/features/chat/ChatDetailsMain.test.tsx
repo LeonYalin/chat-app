@@ -2,9 +2,20 @@ import { renderWithProviders } from '@client/utils/test-utils';
 import { ChatDetailsMain } from './ChatDetailsMain';
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import { Chat, createChat } from '@shared/models/chat.model';
+import { User } from '@shared/models/user.model';
 import { graphql } from 'msw';
 import { setupServer } from 'msw/node';
 import { AppStore, setupStore } from '@client/store';
+import { MemoryRouter } from 'react-router-dom';
+
+const mockUser: User = {
+  id: '1',
+  name: 'Test User',
+  email: 'testemail@gmail.com',
+  password: 'testpassword',
+  avatarUrl: 'testurl',
+  createdAt: new Date().toISOString(),
+};
 
 export const handlers = [
   graphql.mutation('AddChat', (req, res, ctx) => {
@@ -71,6 +82,13 @@ export const handlers = [
       }),
     );
   }),
+  graphql.mutation('DeleteUser', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        deleteUser: mockUser.email,
+      }),
+    );
+  }),
 ];
 
 // mock service worker
@@ -86,40 +104,35 @@ beforeEach(() => {
   store = setupStore();
 });
 
-// let mockChat: Chat | null = null;
-// let mockPanelWidth = 0;
-// let mockOnChatMessage: jest.Mock;
-// let mockOnChatDelete: jest.Mock;
-// let mockOnChatNameChange: jest.Mock;
-
-// beforeEach(() => {
-//   jest.clearAllMocks();
-//   mockPanelWidth = 0;
-//   mockOnChatMessage = jest.fn(msg => {
-//     /**/
-//   });
-//   mockOnChatDelete = jest.fn(chatId => {
-//     /**/
-//   });
-//   mockOnChatNameChange = jest.fn((chatId, newName) => {
-//     /**/
-//   });
-// });
-
 it('should render correctly', () => {
-  const { baseElement } = renderWithProviders(<ChatDetailsMain />);
+  const { baseElement } = renderWithProviders(
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
+      <ChatDetailsMain />
+    </MemoryRouter>,
+    { store },
+  );
   expect(baseElement).toBeTruthy();
 });
 
 it('should render empty state when no chats selected', () => {
-  const { baseElement } = renderWithProviders(<ChatDetailsMain />);
+  const { baseElement } = renderWithProviders(
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
+      <ChatDetailsMain />
+    </MemoryRouter>,
+    { store },
+  );
   expect(baseElement).toBeTruthy();
 
   expect(screen.getByText('Select a chat to start messaging')).toBeTruthy();
 });
 
 it('should handle onChatDelete correctly', () => {
-  renderWithProviders(<ChatDetailsMain />);
+  renderWithProviders(
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
+      <ChatDetailsMain />
+    </MemoryRouter>,
+    { store },
+  );
 
   waitFor(() => {
     expect(store.getState().chat.chats.length).toBe(2);
@@ -139,7 +152,12 @@ it('should handle onChatDelete correctly', () => {
 });
 
 it('should handle onChatMessage correctly', () => {
-  renderWithProviders(<ChatDetailsMain />);
+  renderWithProviders(
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
+      <ChatDetailsMain />
+    </MemoryRouter>,
+    { store },
+  );
 
   waitFor(() => {
     expect(store.getState().chat.chats.length).toBe(2);
@@ -159,7 +177,12 @@ it('should handle onChatMessage correctly', () => {
 });
 
 it('should handle onChatNameChange correctly', () => {
-  renderWithProviders(<ChatDetailsMain />);
+  renderWithProviders(
+    <MemoryRouter initialEntries={['/']} initialIndex={0}>
+      <ChatDetailsMain />
+    </MemoryRouter>,
+    { store },
+  );
 
   waitFor(() => {
     expect(store.getState().chat.chats.length).toBe(2);

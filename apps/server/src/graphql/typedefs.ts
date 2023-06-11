@@ -69,5 +69,6 @@ export const typeDefs = `
     changeChatName(chatId: String!, newName: String!): Chat!
     addChatMessage(chatId: String!, content: String!): ChatMessageOutput!
     signUp(name: String!, email: String!, password: String!): User!
+    deleteUser(userEmail: String!): String!
   }
 `;

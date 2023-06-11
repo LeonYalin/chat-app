@@ -7,7 +7,7 @@ import { ChatDetailsMain } from './features/chat/ChatDetailsMain';
 import { AuthGuard } from './shared/AuthGuard';
 import { SignIn } from './features/auth/SignIn';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { User } from '@shared/models/chat.model';
+import { User } from '@shared/models/user.model';
 import { setUser } from './features/auth/auth.slice';
 import { SignUp } from './features/auth/SignUp';
 
@@ -15,8 +15,13 @@ const StyledApp = styled.div`
   // Your style here
 `;
 
-function getSavedUser() {
-  const user: User = JSON.parse(localStorage.getItem('user') || '{}');
+function getSavedUser(): User | null {
+  let user: User | null = null;
+  try {
+    user = JSON.parse(localStorage.getItem('user') || '');
+  } catch (e) {
+    user = null;
+  }
   return user;
 }
 
