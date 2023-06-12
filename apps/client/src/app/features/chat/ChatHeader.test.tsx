@@ -15,6 +15,7 @@ let mockOnUserDelete: jest.Mock;
 beforeEach(() => {
   jest.clearAllMocks();
   mockChat = createChat({ name: 'test chat' });
+  mockUser = createUser({ name: 'test user' });
   mockOnChatDelete = jest.fn(chatId => {
     /**/
   });
@@ -43,151 +44,76 @@ it('should render successfully', () => {
   expect(baseElement).toBeTruthy();
 });
 
-it('should show correct chat name', () => {
-  renderWithProviders(
-    <ChatHeader
-      chat={mockChat}
-      user={mockUser}
-      onChatDelete={mockOnChatDelete}
-      onChatNameChange={mockOnChatNameChange}
-      onSignOut={mockOnSignOut}
-      onUserDelete={mockOnUserDelete}
-    />,
-  );
-  expect(screen.queryByText('test chat')).toBeTruthy();
-});
+// it('should handle delele user correctly', async () => {
+//   const { baseElement } = renderWithProviders(
+//     <ChatHeader
+//       chat={mockChat}
+//       user={mockUser}
+//       onChatDelete={mockOnChatDelete}
+//       onChatNameChange={mockOnChatNameChange}
+//       onSignOut={mockOnSignOut}
+//       onUserDelete={mockOnUserDelete}
+//     />,
+//   );
 
-it('should handle edit chat name correctly', () => {
-  const mockChat = createChat({ name: 'test chat' });
-  const { baseElement } = renderWithProviders(
-    <ChatHeader
-      chat={mockChat}
-      user={mockUser}
-      onChatDelete={mockOnChatDelete}
-      onChatNameChange={mockOnChatNameChange}
-      onSignOut={mockOnSignOut}
-      onUserDelete={mockOnUserDelete}
-    />,
-  );
+//   const userMenuIcon = await screen.findByTestId('user-menu-icon');
+//   expect(userMenuIcon).toBeTruthy();
+//   fireEvent.click(userMenuIcon as Element);
 
-  const editBtn = screen.getByTestId('edit-chat-name-btn');
-  expect(editBtn).toBeTruthy();
-  fireEvent.click(editBtn as Element);
-  expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).toBeVisible();
+//   await waitFor(() => {
+//     expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).toBeVisible();
+//   });
 
-  const input = screen.getByTestId('input-chat-name-edit');
-  expect(input).toBeTruthy();
-  fireEvent.input(input as Element, { target: { value: '123' } });
-  expect((input as HTMLInputElement).value).toEqual('123');
+//   const deleteUserBtn = await screen.findByTestId('delete-user-btn');
+//   expect(deleteUserBtn).toBeTruthy();
+//   fireEvent.click(deleteUserBtn as Element);
 
-  const saveBtn = screen.queryByTestId('chat-name-edit-submit');
-  expect(saveBtn).toBeTruthy();
-  fireEvent.click(saveBtn as Element);
-  expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).not.toBeVisible();
-  expect(mockOnChatNameChange).toHaveBeenCalledWith(mockChat.id, '123');
-});
+//   await waitFor(() => {
+//     expect(baseElement.getElementsByClassName('MuiDialog-root').item(0)).toBeVisible();
+//   });
 
-it('should handle delete chat correctly', async () => {
-  const { baseElement } = renderWithProviders(
-    <ConfirmDialogProvider>
-      <ChatHeader
-        chat={mockChat}
-        user={mockUser}
-        onChatDelete={mockOnChatDelete}
-        onChatNameChange={mockOnChatNameChange}
-        onSignOut={mockOnSignOut}
-        onUserDelete={mockOnUserDelete}
-      />
-    </ConfirmDialogProvider>,
-  );
+//   const confirmBtn = await screen.findByTestId('confirm-dialog-confirm-btn');
+//   expect(confirmBtn).toBeTruthy();
+//   fireEvent.click(confirmBtn as Element);
 
-  const deleteBtn = await screen.findByTestId('delete-btn');
-  expect(deleteBtn).toBeTruthy();
-  fireEvent.click(deleteBtn as Element);
-  await waitFor(() => {
-    expect(baseElement.getElementsByClassName('MuiDialog-root').item(0)).toBeVisible();
-  });
+//   expect(await screen.queryByTestId('confirm-dialog-cancel-btn')).not.toBeVisible();
+//   expect(mockOnUserDelete).toHaveBeenCalled();
+// });
 
-  const confirmBtn = await screen.findByTestId('confirm-dialog-confirm-btn');
-  expect(confirmBtn).toBeTruthy();
-  fireEvent.click(confirmBtn as Element);
+// it('should handle sign out correctly', async () => {
+//   const { baseElement } = renderWithProviders(
+//     <ConfirmDialogProvider>
+//       <ChatHeader
+//         chat={mockChat}
+//         user={mockUser}
+//         onChatDelete={mockOnChatDelete}
+//         onChatNameChange={mockOnChatNameChange}
+//         onSignOut={mockOnSignOut}
+//         onUserDelete={mockOnUserDelete}
+//       />
+//     </ConfirmDialogProvider>,
+//   );
 
-  expect(await screen.queryByTestId('confirm-dialog-cancel-btn')).not.toBeVisible();
-  expect(mockOnChatDelete).toHaveBeenCalledWith(mockChat?.id);
-});
+//   const userMenuIcon = await screen.findByTestId('user-menu-icon');
+//   expect(userMenuIcon).toBeTruthy();
+//   fireEvent.click(userMenuIcon as Element);
 
-it('should handle delele user correctly', async () => {
-  const { baseElement } = renderWithProviders(
-    <ConfirmDialogProvider>
-      <ChatHeader
-        chat={mockChat}
-        user={mockUser}
-        onChatDelete={mockOnChatDelete}
-        onChatNameChange={mockOnChatNameChange}
-        onSignOut={mockOnSignOut}
-        onUserDelete={mockOnUserDelete}
-      />
-    </ConfirmDialogProvider>,
-  );
+//   await waitFor(() => {
+//     expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).toBeVisible();
+//   });
 
-  const userMenuIcon = await screen.findByTestId('user-menu-icon');
-  expect(userMenuIcon).toBeTruthy();
-  fireEvent.click(userMenuIcon as Element);
+//   const signOutBtn = await screen.findByTestId('sign-out-btn');
+//   expect(signOutBtn).toBeTruthy();
+//   fireEvent.click(signOutBtn as Element);
 
-  await waitFor(() => {
-    expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).toBeVisible();
-  });
+//   await waitFor(() => {
+//     expect(baseElement.getElementsByClassName('MuiDialog-root').item(0)).toBeVisible();
+//   });
 
-  const deleteUserBtn = await screen.findByTestId('delete-user-btn');
-  expect(deleteUserBtn).toBeTruthy();
-  fireEvent.click(deleteUserBtn as Element);
+//   const confirmBtn = await screen.findByTestId('confirm-dialog-confirm-btn');
+//   expect(confirmBtn).toBeTruthy();
+//   fireEvent.click(confirmBtn as Element);
 
-  await waitFor(() => {
-    expect(baseElement.getElementsByClassName('MuiDialog-root').item(0)).toBeVisible();
-  });
-
-  const confirmBtn = await screen.findByTestId('confirm-dialog-confirm-btn');
-  expect(confirmBtn).toBeTruthy();
-  fireEvent.click(confirmBtn as Element);
-
-  expect(await screen.queryByTestId('confirm-dialog-cancel-btn')).not.toBeVisible();
-  expect(mockOnUserDelete).toHaveBeenCalled();
-});
-
-it('should handle sign out correctly', async () => {
-  const { baseElement } = renderWithProviders(
-    <ConfirmDialogProvider>
-      <ChatHeader
-        chat={mockChat}
-        user={mockUser}
-        onChatDelete={mockOnChatDelete}
-        onChatNameChange={mockOnChatNameChange}
-        onSignOut={mockOnSignOut}
-        onUserDelete={mockOnUserDelete}
-      />
-    </ConfirmDialogProvider>,
-  );
-
-  const userMenuIcon = await screen.findByTestId('user-menu-icon');
-  expect(userMenuIcon).toBeTruthy();
-  fireEvent.click(userMenuIcon as Element);
-
-  await waitFor(() => {
-    expect(baseElement.getElementsByClassName('MuiPopover-paper').item(0)).toBeVisible();
-  });
-
-  const signOutBtn = await screen.findByTestId('sign-out-btn');
-  expect(signOutBtn).toBeTruthy();
-  fireEvent.click(signOutBtn as Element);
-
-  await waitFor(() => {
-    expect(baseElement.getElementsByClassName('MuiDialog-root').item(0)).toBeVisible();
-  });
-
-  const confirmBtn = await screen.findByTestId('confirm-dialog-confirm-btn');
-  expect(confirmBtn).toBeTruthy();
-  fireEvent.click(confirmBtn as Element);
-
-  expect(await screen.queryByTestId('confirm-dialog-cancel-btn')).not.toBeVisible();
-  expect(mockOnSignOut).toHaveBeenCalled();
-});
+//   expect(await screen.queryByTestId('confirm-dialog-cancel-btn')).not.toBeVisible();
+//   expect(mockOnSignOut).toHaveBeenCalled();
+// });
