@@ -44,3 +44,11 @@ mutation DeleteUser($userEmail: String!) {
     deleteUser(userEmail: $userEmail)
   }
 `;
+
+export const ChangeChatParticipantsMutationStr = `
+mutation ChangeChatParticipants($chatId: String!, $participants: [UserInput!]!, $newName: String) {
+    changeChatParticipants(chatId: $chatId, participants: $participants, newName: $newName) {
+      ...ChatFields
+    }
+  }
+`;

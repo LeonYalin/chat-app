@@ -98,7 +98,16 @@ export function ChatsPanel(props: Props) {
                   <ListItemIcon>
                     <Avatar alt={chat.name} sx={{ width: 28, height: 28 }} src="/static/images/avatar/1.jpg" />
                   </ListItemIcon>
-                  <ListItemText primary={chat.name} />
+                  <ListItemText
+                    primary={chat.name}
+                    sx={{
+                      '& .MuiTypography-root': {
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      },
+                    }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}

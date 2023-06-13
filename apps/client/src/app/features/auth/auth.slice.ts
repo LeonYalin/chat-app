@@ -1,18 +1,20 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from '@client/store';
 import { UIState } from '@client/utils/enums';
-import { deleteUserApi, signInApi, signUpApi } from './auth.api';
+import { deleteUserApi, loadAllUsersApi, signInApi, signUpApi } from './auth.api';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import { User } from '@shared/models/user.model';
 
 export interface AuthState {
   user: User | null;
+  allUsers: User[];
   uiState: UIState;
 }
 
 const initialState: AuthState = {
   user: null,
+  allUsers: [],
   uiState: UIState.IDLE,
 };
 
@@ -78,7 +80,6 @@ export const signOutAsync =
   ({ navigate }: { navigate: ReturnType<typeof useNavigate> }): AppThunk =>
   (dispatch, getState) => {
     const user = getState().auth.user;
-    console.log('signOutAsync', user);
     if (user) {
       dispatch(setUser({ user: null }));
       dispatch(setRememberMe({ rememberMe: false }));
@@ -98,12 +99,28 @@ export const deleteUserAsync =
       });
   };
 
+export const loadAllUsersAsync = (): AppThunk => (dispatch, getState) => {
+  loadAllUsersApi()
+    .then(res => {
+      const allUsers = res.data.loadAllUsers;
+      if (allUsers) {
+        dispatch(setAllUsers({ allUsers }));
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<{ user: User | null }>) => {
       state.user = action.payload.user;
+    },
+    setAllUsers: (state, action: PayloadAction<{ allUsers: User[] }>) => {
+      state.allUsers = action.payload.allUsers;
     },
     setRememberMe: (state, action: PayloadAction<{ rememberMe: boolean }>) => {
       if (action.payload.rememberMe) {
@@ -136,10 +153,11 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setUser, setRememberMe } = authSlice.actions;
+export const { setUser, setAllUsers, setRememberMe } = authSlice.actions;
 
 export const selectAuthState = (state: RootState) => state.auth;
 export const selectUser = (state: RootState) => state.auth.user;
+export const selectAllUsers = (state: RootState) => state.auth.allUsers;
 export const selectIsAuthenticated = (state: RootState) => !!state.auth.user;
 
 export default authSlice.reducer;

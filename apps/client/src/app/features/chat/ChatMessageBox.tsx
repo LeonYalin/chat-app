@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 
 type Props = {
+  disabled?: boolean;
   onChatMessage: (message: string) => void;
 };
 
@@ -16,6 +17,7 @@ export function ChatMessageBox(props: Props) {
   return (
     <Wrapper>
       <TextField
+        disabled={props.disabled}
         inputProps={{ 'data-testid': 'chat-message-box-input' }}
         id="msgbox"
         value={text}
@@ -24,7 +26,13 @@ export function ChatMessageBox(props: Props) {
         variant="outlined"
         fullWidth
       />
-      <IconButton data-testid="chat-message-box-send-btn" color="primary" aria-label="Send" onClick={() => props.onChatMessage(text)}>
+      <IconButton
+        data-testid="chat-message-box-send-btn"
+        color="primary"
+        aria-label="Send"
+        disabled={props.disabled || text.length === 0}
+        onClick={() => props.onChatMessage(text)}
+      >
         <SendIcon fontSize="large" />
       </IconButton>
     </Wrapper>

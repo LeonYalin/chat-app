@@ -1,6 +1,6 @@
 import { renderWithProviders } from '@client/utils/test-utils';
 import { ChatMessageBox } from './ChatMessageBox';
-import { fireEvent, screen } from '@testing-library/dom';
+import { fireEvent, screen, waitFor } from '@testing-library/dom';
 
 let mockOnChatMessage: jest.Mock;
 
@@ -29,4 +29,18 @@ it('should render a chat message correctly, and pass onChatMessage callback', ()
   expect(sendBtn).toBeTruthy();
   fireEvent.click(sendBtn as Element);
   expect(mockOnChatMessage).toHaveBeenCalledWith('123');
+});
+
+it('should disable input and button if disable flag provided', async () => {
+  const { baseElement } = renderWithProviders(<ChatMessageBox onChatMessage={mockOnChatMessage} disabled={true} />);
+  expect(baseElement).toBeTruthy();
+
+  const input = await screen.findByTestId('chat-message-box-input');
+  const sendBtn = await screen.findByTestId('chat-message-box-send-btn');
+  await waitFor(() => {
+    expect(input).toBeTruthy();
+    expect(input).toBeDisabled();
+    expect(sendBtn).toBeTruthy();
+    expect(sendBtn).toBeDisabled();
+  });
 });

@@ -8,6 +8,7 @@ import { Chat } from '@shared/models/chat.model';
 
 type Props = {
   chat: Chat | null;
+  participantsEmpty: boolean;
   onChatMessage: (message: string) => void;
 };
 
@@ -34,7 +35,7 @@ export function ChatBody(props: Props) {
               messages={emptyConversationMessages}
             ></EmptyState>
           )}
-          <ChatMessageBox onChatMessage={props.onChatMessage}></ChatMessageBox>
+          <ChatMessageBox disabled={props.participantsEmpty} onChatMessage={props.onChatMessage}></ChatMessageBox>
         </>
       ) : (
         <EmptyState icon={<QuestionAnswerIcon />} messages={noChatMessages}></EmptyState>

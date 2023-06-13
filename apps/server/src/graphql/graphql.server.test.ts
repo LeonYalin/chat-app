@@ -6,18 +6,24 @@ import {
   AddChatMessageMutationStr,
   AddChatMutationStr,
   ChangeChatNameMutationStr,
+  ChangeChatParticipantsMutationStr,
   DeleteChatMutationStr,
   DeleteUserMutationStr,
   SignUpMutationStr,
 } from '@shared/graphql/mutations';
-import { LoadChatQueryStr, LoadAllChatsQueryStr as LoadAllChatsQueryStr, SignInQueryStr } from '@shared/graphql/queries';
+import {
+  LoadChatQueryStr,
+  LoadAllChatsQueryStr as LoadAllChatsQueryStr,
+  SignInQueryStr,
+  LoadAllUsersQueryStr,
+} from '@shared/graphql/queries';
 import db from '../db.utils';
 import { User } from '@shared/models/user.model';
 import { comparePasswordAndHash, hashPassword } from '../crypto.utils';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
   const response = await testServer.executeOperation<{ chat: Chat }>({
-    query: `${ChatFieldsFragmentStr}${AddChatMutationStr}`,
+    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${AddChatMutationStr}`,
     variables: { chat: mockChat },
   });
 
@@ -28,7 +34,7 @@ async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
 
 async function testLoadChat(testServer: ApolloServer, mockChatId: string, { expected }: { expected: Chat }) {
   const response = await testServer.executeOperation({
-    query: `${ChatFieldsFragmentStr}${LoadChatQueryStr}`,
+    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${LoadChatQueryStr}`,
     variables: { chatId: mockChatId },
   });
 
@@ -51,7 +57,7 @@ async function testAddChatMessage(testServer: ApolloServer, chatId: string, cont
 
 async function testChangeChatName(testServer: ApolloServer, chatId: string, newName: string) {
   const response = await testServer.executeOperation<{ chatId: string; newName: string }>({
-    query: `${ChatFieldsFragmentStr}${ChangeChatNameMutationStr}`,
+    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${ChangeChatNameMutationStr}`,
     variables: { chatId, newName },
   });
 
@@ -74,12 +80,13 @@ async function testDeleteChat(testServer: ApolloServer, mockChatId: string) {
 
 async function testLoadAllChats(testServer: ApolloServer, { expected }: { expected: Chat[] }) {
   const response = await testServer.executeOperation({
-    query: `${ChatFieldsFragmentStr}${LoadAllChatsQueryStr}`,
+    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${LoadAllChatsQueryStr}`,
     variables: {},
   });
 
   const { data, errors } = getResponseData<{ loadAllChats: Chat[] }>(response);
   expect(errors).toBeUndefined();
+  expect(data.loadAllChats.length).toEqual(expected.length);
   expect(data.loadAllChats).toEqual(expected);
 }
 
@@ -140,10 +147,48 @@ async function testDeleteUser(testServer: ApolloServer, mockUserEmail: string) {
   expect(data.deleteUser).toEqual(mockUserEmail);
 }
 
-async function clearDbData() {
-  await db().delete('/chats');
-  await db().delete('/users');
+async function testLoadAllUsers(testServer: ApolloServer, { expected }: { expected: User[] }) {
+  const response = await testServer.executeOperation({
+    query: `${UserFieldsFragmentStr}${LoadAllUsersQueryStr}`,
+    variables: {},
+  });
+
+  const { data, errors } = getResponseData<{ loadAllUsers: User[] }>(response);
+  expect(errors).toBeUndefined();
+  expect(data.loadAllUsers.length).toEqual(expected.length);
+  data.loadAllUsers.forEach((user, index) => {
+    expect(user.name).toEqual(expected[index].name);
+    expect(user.email).toEqual(expected[index].email);
+  });
 }
+
+async function testChangeChatParticipants(testServer: ApolloServer, chatId: string, participants: User[], newName: string) {
+  const response = await testServer.executeOperation<{ chatId: string; participants: User[]; newName: string }>({
+    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${ChangeChatParticipantsMutationStr}`,
+    variables: { chatId, participants, newName },
+  });
+
+  const { data, errors } = getResponseData<{ changeChatParticipants: Chat }>(response);
+  expect(errors).toBeUndefined();
+  expect(data.changeChatParticipants.id).toEqual(chatId);
+  expect(data.changeChatParticipants.participants).toEqual(participants);
+  expect(data.changeChatParticipants.name).toEqual(newName);
+}
+
+async function clearDbData() {
+  await Promise.all([db().delete('/chats'), db().delete('/users')]);
+}
+
+const mockParticipants: User[] = [
+  {
+    id: '123',
+    name: 'John Doe',
+    email: 'testemail@gmail.com',
+    password: 'testpassword',
+    avatarUrl: 'https://example.com',
+    createdAt: new Date().toISOString(),
+  },
+];
 
 describe('Chats server tests', () => {
   beforeEach(async () => {
@@ -164,7 +209,7 @@ describe('Chats server tests', () => {
       name: 'My Chat',
       avatarUrl: 'https://example.com',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
 
@@ -181,7 +226,7 @@ describe('Chats server tests', () => {
       name: 'My Chat',
       avatarUrl: 'https://example.com',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
     await testAddChat(testServer, mockChat);
@@ -189,7 +234,7 @@ describe('Chats server tests', () => {
     await testLoadAllChats(testServer, { expected: [] });
   });
 
-  test('should load chats correctly', async () => {
+  test('should load all chats correctly', async () => {
     const testServer = createApolloTestingServer();
     await testLoadAllChats(testServer, { expected: [] });
 
@@ -198,7 +243,7 @@ describe('Chats server tests', () => {
       name: 'My Chat',
       avatarUrl: 'https://example.com',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
 
@@ -210,7 +255,7 @@ describe('Chats server tests', () => {
       name: 'My Chat 2',
       avatarUrl: 'https://example.com2',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
 
@@ -227,7 +272,7 @@ describe('Chats server tests', () => {
       name: 'My Chat',
       avatarUrl: 'https://example.com',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
 
@@ -245,7 +290,7 @@ describe('Chats server tests', () => {
       name: 'My Chat',
       avatarUrl: 'https://example.com',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
 
@@ -263,7 +308,7 @@ describe('Chats server tests', () => {
       name: 'My Chat',
       avatarUrl: 'https://example.com',
       messages: [],
-      participants: [],
+      participants: mockParticipants,
       createdAt: new Date().toISOString(),
     };
     await testAddChat(testServer, mockChat);
@@ -329,5 +374,75 @@ describe('Chats server tests', () => {
     await testSignIn(testServer, { ...mockUser, valid: true });
     await testDeleteUser(testServer, mockUser.email);
     await testSignIn(testServer, { ...mockUser, valid: false });
+  });
+
+  test('should load all users correctly', async () => {
+    const testServer = createApolloTestingServer();
+    await testLoadAllUsers(testServer, { expected: [] });
+
+    const mockUser: User = {
+      id: '345',
+      name: 'Test User',
+      email: 'testemail@gmail.com',
+      password: 'testpassword',
+      avatarUrl: 'https://example.com',
+      createdAt: new Date().toISOString(),
+    };
+
+    const mockUser2: User = {
+      id: '123',
+      name: 'Test User2',
+      email: 'testemail2@gmail.com',
+      password: 'testpassword2',
+      avatarUrl: 'https://example2.com',
+      createdAt: new Date().toISOString(),
+    };
+
+    await testSignUp(testServer, { ...mockUser, attempt: 1 });
+    await testSignUp(testServer, { ...mockUser2, attempt: 1 });
+    await testLoadAllUsers(testServer, { expected: [mockUser, mockUser2] });
+  });
+
+  test('should change a chat participants and a chat name correctly', async () => {
+    const testServer = createApolloTestingServer();
+    console.log('before testLoadAllUsers');
+    await testLoadAllUsers(testServer, { expected: [] });
+
+    const mockUser: User = {
+      id: '345',
+      name: 'Test User',
+      email: 'testemail@gmail.com',
+      password: 'testpassword',
+      avatarUrl: 'https://example.com',
+      createdAt: new Date().toISOString(),
+    };
+
+    const mockUser2: User = {
+      id: '123',
+      name: 'Test User2',
+      email: 'testemail2@gmail.com',
+      password: 'testpassword2',
+      avatarUrl: 'https://example2.com',
+      createdAt: new Date().toISOString(),
+    };
+
+    await testSignUp(testServer, { ...mockUser, attempt: 1 });
+    await testSignUp(testServer, { ...mockUser2, attempt: 1 });
+    await testLoadAllUsers(testServer, { expected: [mockUser, mockUser2] });
+
+    const mockChat: Chat = {
+      id: '678',
+      name: 'My Chat',
+      avatarUrl: 'https://example.com',
+      messages: [],
+      participants: mockParticipants,
+      createdAt: new Date().toISOString(),
+    };
+
+    await testAddChat(testServer, mockChat);
+    await testLoadAllChats(testServer, { expected: [mockChat] });
+
+    const newMockParticipants: User[] = [...mockParticipants, mockUser, mockUser2];
+    await testChangeChatParticipants(testServer, mockChat.id, newMockParticipants, 'Chat Name Changed');
   });
 });

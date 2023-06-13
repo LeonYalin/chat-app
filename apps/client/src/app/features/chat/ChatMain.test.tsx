@@ -6,6 +6,7 @@ import { renderWithProviders } from '@client/utils/test-utils';
 import { graphql } from 'msw';
 import { Chat } from '@shared/models/chat.model';
 import { MemoryRouter } from 'react-router-dom';
+import { createUser } from '@shared/models/user.model';
 
 export const handlers = [
   graphql.mutation('AddChat', (req, res, ctx) => {
@@ -69,6 +70,17 @@ export const handlers = [
     return res(
       ctx.data({
         loadAllChats: mockChats,
+      }),
+    );
+  }),
+  graphql.query('LoadAllUsers', (req, res, ctx) => {
+    const mockCurrentUser = createUser({ name: 'Test User 1' });
+    const mockUser2 = createUser({ name: 'Test User 2' });
+    const mockUser3 = createUser({ name: 'Test User 3' });
+    const mockUsers = [mockCurrentUser, mockUser2, mockUser3];
+    return res(
+      ctx.data({
+        loadAllUsers: mockUsers,
       }),
     );
   }),

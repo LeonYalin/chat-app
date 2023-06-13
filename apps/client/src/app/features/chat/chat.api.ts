@@ -1,9 +1,16 @@
 import { gql } from '@apollo/client';
 import gqlClient from '@client/utils/graphql.client.utils';
-import { AddChatMessageMutationStr, AddChatMutationStr, ChangeChatNameMutationStr, DeleteChatMutationStr } from '@shared/graphql/mutations';
+import {
+  AddChatMessageMutationStr,
+  AddChatMutationStr,
+  ChangeChatNameMutationStr,
+  ChangeChatParticipantsMutationStr,
+  DeleteChatMutationStr,
+} from '@shared/graphql/mutations';
 import { LoadAllChatsQueryStr } from '@shared/graphql/queries';
 import { LoadChatQueryStr } from '@shared/graphql/queries';
 import { Chat, ChatMessage } from '@shared/models/chat.model';
+import { User } from '@shared/models/user.model';
 
 export function addChatApi({ chat }: { chat: Chat }) {
   return gqlClient().mutate<{ addChat: Chat }>({
@@ -55,5 +62,14 @@ export function loadAllChatsApi() {
     query: gql`
       ${LoadAllChatsQueryStr}
     `,
+  });
+}
+
+export function changeChatParticipantsApi({ chatId, participants, newName }: { chatId: string; participants: User[]; newName?: string }) {
+  return gqlClient().mutate<{ changeChatParticipants: Chat }>({
+    mutation: gql`
+      ${ChangeChatParticipantsMutationStr}
+    `,
+    variables: { chatId, participants, newName },
   });
 }

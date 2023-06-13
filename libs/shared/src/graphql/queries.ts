@@ -21,3 +21,11 @@ query SignIn($email: String!, $password: String!) {
     }
   }
 `;
+
+export const LoadAllUsersQueryStr = `
+query LoadAllUsers {
+    loadAllUsers {
+      ...UserFields
+    }
+  }
+`;

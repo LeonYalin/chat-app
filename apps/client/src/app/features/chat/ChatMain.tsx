@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { UIState } from '@client/utils/enums';
+import { loadAllUsersAsync, selectUser } from '../auth/auth.slice';
+import { omit } from 'lodash';
 
 const panelWidth = 240;
 
@@ -19,11 +21,13 @@ export function ChatMain() {
   const dispatch = useAppDispatch();
   const chats = useAppSelector(selectChats);
   const selectedChat = useAppSelector(selectSelectedChat);
+  const user = useAppSelector(selectUser);
   const uiState = useAppSelector(selectUIState);
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(loadAllChatsAsync());
+    dispatch(loadAllUsersAsync());
   }, [dispatch]);
 
   return (
@@ -40,7 +44,10 @@ export function ChatMain() {
         panelWidth={panelWidth}
         chats={chats}
         selectedChat={selectedChat}
-        onAddChatClick={() => dispatch(addChatAsync())}
+        onAddChatClick={() => {
+          const participants = user ? [omit(user, '__typename')] : [];
+          dispatch(addChatAsync({ chat: { participants } }));
+        }}
         onChatClick={chatId => {
           navigate(`/chats/${chatId}`);
         }}

@@ -52,6 +52,14 @@ export const resolvers = {
         throwGqlDefaultError(err);
       }
     },
+    loadAllUsers: async () => {
+      try {
+        const allUsers: User[] = await db().getObjectDefault<User[]>('/users', []);
+        return allUsers;
+      } catch (err) {
+        throwGqlDefaultError(err);
+      }
+    },
   },
   Mutation: {
     addChat: async (data, variables: { chat: Chat }) => {
@@ -151,6 +159,26 @@ export const resolvers = {
             await db().delete(`/users[${index}]`);
             return userEmail;
           }
+        } else {
+          throwGqlError();
+        }
+      } catch (err) {
+        throwGqlDefaultError(err);
+      }
+    },
+    changeChatParticipants: async (data, variables: { chatId: string; participants: User[]; newName?: string }) => {
+      try {
+        const chats: Chat[] = await db().getObjectDefault<Chat[]>('/chats', []);
+        const { chatId, participants, newName } = variables;
+        if (chatId && participants) {
+          const index = chats.findIndex(chat => chat.id === chatId);
+          if (index > -1) {
+            await db().push(`/chats[${index}]/participants`, participants);
+            newName && (await db().push(`/chats[${index}]/name`, newName));
+          } else {
+            throwGqlError('Chat not found');
+          }
+          return chats[index];
         } else {
           throwGqlError();
         }

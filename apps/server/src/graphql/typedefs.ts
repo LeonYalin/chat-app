@@ -49,7 +49,7 @@ export const typeDefs = `
   }
 
   input UserInput {
-    id: String!
+    id: String! 
     name: String!
     email: String!
     password: String!
@@ -61,6 +61,7 @@ export const typeDefs = `
     loadAllChats: [Chat!]!
     loadChat(chatId: String!): Chat!
     signIn(email: String!, password: String!): User!
+    loadAllUsers: [User!]!
   }
 
   type Mutation {
@@ -70,5 +71,6 @@ export const typeDefs = `
     addChatMessage(chatId: String!, content: String!): ChatMessageOutput!
     signUp(name: String!, email: String!, password: String!): User!
     deleteUser(userEmail: String!): String!
+    changeChatParticipants(chatId: String!, participants: [UserInput!]!, newName: String): Chat!
   }
 `;

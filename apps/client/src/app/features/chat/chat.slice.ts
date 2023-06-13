@@ -3,7 +3,15 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState, AppThunk } from '../../store';
 import { UIState } from '@client/utils/enums';
 import { createChat, Chat } from '@shared/models/chat.model';
-import { addChatApi, addChatMessageApi, changeChatNameApi, deleteChatApi, loadAllChatsApi, loadChatApi } from './chat.api';
+import {
+  addChatApi,
+  addChatMessageApi,
+  changeChatNameApi,
+  changeChatParticipantsApi,
+  deleteChatApi,
+  loadAllChatsApi,
+  loadChatApi,
+} from './chat.api';
 import { User } from '@shared/models/user.model';
 
 export interface ChatState {
@@ -20,8 +28,8 @@ const initialState: ChatState = {
   uiState: UIState.IDLE,
 };
 
-export const addChatAsync = createAsyncThunk('chat/addChatAsync', () => {
-  return addChatApi({ chat: createChat() });
+export const addChatAsync = createAsyncThunk('chat/addChatAsync', ({ chat }: { chat: Partial<Chat> }) => {
+  return addChatApi({ chat: createChat({ ...chat }) });
 });
 
 export const loadChatAsync = createAsyncThunk('chat/loadChatAsync', ({ chatId }: { chatId: string }) => {
@@ -59,6 +67,21 @@ export const loadAllChatsAsync = (): AppThunk => (dispatch, getState) => {
     });
 };
 
+export const changeChatParticipantsAsync =
+  ({ chatId, participants, newName }: { chatId: string; participants: User[]; newName?: string }): AppThunk =>
+  (dispatch, getState) => {
+    changeChatParticipantsApi({ chatId, participants, newName })
+      .then(res => {
+        const chat = res.data?.changeChatParticipants;
+        if (chat) {
+          dispatch(updateChat({ chat }));
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
 export const chatSlice = createSlice({
   name: 'chat',
   initialState,
@@ -66,6 +89,13 @@ export const chatSlice = createSlice({
     setChats: (state, action: PayloadAction<{ chats: Chat[] }>) => {
       const { chats } = action.payload;
       state.chats = chats;
+    },
+    updateChat: (state, action: PayloadAction<{ chat: Chat }>) => {
+      const { chat } = action.payload;
+      const index = state.chats.findIndex(c => c.id === chat.id);
+      if (index > -1) {
+        state.chats[index] = chat;
+      }
     },
     setSelectedChatId: (state, action: PayloadAction<{ selectedChatId: string | null }>) => {
       const { selectedChatId } = action.payload;
@@ -134,7 +164,7 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { setChats, setSelectedChatId } = chatSlice.actions;
+export const { setChats, updateChat, setSelectedChatId } = chatSlice.actions;
 
 export const selectChatState = (state: RootState) => state.chat;
 export const selectChats = (state: RootState) => state.chat.chats;

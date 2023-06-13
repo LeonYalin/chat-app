@@ -10,9 +10,7 @@ export const ChatFieldsFragmentStr = `
       createdAt
     }
     participants {
-      id
-      name
-      avatarUrl
+      ...UserFields
     }
     createdAt
   }
