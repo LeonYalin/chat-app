@@ -4,10 +4,7 @@ export const ChatFieldsFragmentStr = `
     name
     avatarUrl
     messages {
-      id
-      content
-      userId
-      createdAt
+      ...ChatMessageFields
     }
     participants {
       ...UserFields
@@ -20,7 +17,7 @@ export const ChatMessageFieldsFragmentStr = `
   fragment ChatMessageFields on ChatMessage {
     id
     content
-    userId
+    userName
     createdAt
   }
 `;

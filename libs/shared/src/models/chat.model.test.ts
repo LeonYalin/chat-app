@@ -47,7 +47,7 @@ it('should create a chat message with data correctly', () => {
   const chatMessage = createChatMessage({
     id: '123',
     content: 'Hello',
-    userId: '123',
+    userName: '123',
     createdAt: now,
   });
   expect(chatMessage).toEqual({

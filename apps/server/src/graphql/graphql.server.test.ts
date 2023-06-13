@@ -23,7 +23,7 @@ import { comparePasswordAndHash, hashPassword } from '../crypto.utils';
 
 async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
   const response = await testServer.executeOperation<{ chat: Chat }>({
-    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${AddChatMutationStr}`,
+    query: `${UserFieldsFragmentStr}${ChatMessageFieldsFragmentStr}${ChatFieldsFragmentStr}${AddChatMutationStr}`,
     variables: { chat: mockChat },
   });
 
@@ -34,7 +34,7 @@ async function testAddChat(testServer: ApolloServer, mockChat: Chat) {
 
 async function testLoadChat(testServer: ApolloServer, mockChatId: string, { expected }: { expected: Chat }) {
   const response = await testServer.executeOperation({
-    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${LoadChatQueryStr}`,
+    query: `${UserFieldsFragmentStr}${ChatMessageFieldsFragmentStr}${ChatFieldsFragmentStr}${LoadChatQueryStr}`,
     variables: { chatId: mockChatId },
   });
 
@@ -57,7 +57,7 @@ async function testAddChatMessage(testServer: ApolloServer, chatId: string, cont
 
 async function testChangeChatName(testServer: ApolloServer, chatId: string, newName: string) {
   const response = await testServer.executeOperation<{ chatId: string; newName: string }>({
-    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${ChangeChatNameMutationStr}`,
+    query: `${UserFieldsFragmentStr}${ChatMessageFieldsFragmentStr}${ChatFieldsFragmentStr}${ChangeChatNameMutationStr}`,
     variables: { chatId, newName },
   });
 
@@ -80,7 +80,7 @@ async function testDeleteChat(testServer: ApolloServer, mockChatId: string) {
 
 async function testLoadAllChats(testServer: ApolloServer, { expected }: { expected: Chat[] }) {
   const response = await testServer.executeOperation({
-    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${LoadAllChatsQueryStr}`,
+    query: `${UserFieldsFragmentStr}${ChatMessageFieldsFragmentStr}${ChatFieldsFragmentStr}${LoadAllChatsQueryStr}`,
     variables: {},
   });
 
@@ -164,7 +164,7 @@ async function testLoadAllUsers(testServer: ApolloServer, { expected }: { expect
 
 async function testChangeChatParticipants(testServer: ApolloServer, chatId: string, participants: User[], newName: string) {
   const response = await testServer.executeOperation<{ chatId: string; participants: User[]; newName: string }>({
-    query: `${UserFieldsFragmentStr}${ChatFieldsFragmentStr}${ChangeChatParticipantsMutationStr}`,
+    query: `${UserFieldsFragmentStr}${ChatMessageFieldsFragmentStr}${ChatFieldsFragmentStr}${ChangeChatParticipantsMutationStr}`,
     variables: { chatId, participants, newName },
   });
 

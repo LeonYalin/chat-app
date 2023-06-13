@@ -28,7 +28,7 @@ it('should render correctly when many messages provided', () => {
 });
 
 it('should render message contents correctly', () => {
-  mockChatMessages.push(createChatMessage({ id: '1', content: 'test message 1', userId: 'test sender 1' }));
+  mockChatMessages.push(createChatMessage({ id: '1', content: 'test message 1', userName: 'test sender 1' }));
   renderWithProviders(<ChatMessages messages={mockChatMessages}></ChatMessages>);
   expect(screen.getByText('test message 1')).toBeTruthy();
   expect(screen.getByText('test sender 1')).toBeTruthy();

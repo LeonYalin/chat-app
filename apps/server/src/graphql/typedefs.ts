@@ -23,7 +23,7 @@ export const typeDefs = `
   type ChatMessage {
     id: String!
     content: String!
-    userId: String!
+    userName: String!
     createdAt: String!
   }
 

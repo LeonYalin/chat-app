@@ -23,13 +23,13 @@ const messages: ChatMessage[] = [
   {
     id: '1',
     content: 'Test',
-    userId: '1',
+    userName: '1',
     createdAt: new Date().toISOString(),
   },
   {
     id: '2',
     content: 'Test 2',
-    userId: '2',
+    userName: '2',
     createdAt: new Date().toISOString(),
   },
 ];

@@ -24,7 +24,7 @@ export function createChat(params: Partial<Chat> = {}) {
 export interface ChatMessage {
   id: string;
   content: string;
-  userId: string;
+  userName: string;
   createdAt: string;
 }
 
@@ -32,7 +32,7 @@ export function createChatMessage(params: Partial<ChatMessage> = {}) {
   return {
     id: params.id ?? uuidv4(),
     content: params.content ?? '',
-    userId: params.userId ?? 'Me',
+    userName: params.userName ?? 'Me',
     createdAt: params.createdAt ?? new Date().toISOString(),
   } as ChatMessage;
 }

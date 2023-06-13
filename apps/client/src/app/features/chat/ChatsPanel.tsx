@@ -96,7 +96,7 @@ export function ChatsPanel(props: Props) {
               >
                 <ListItemButton>
                   <ListItemIcon>
-                    <Avatar alt={chat.name} sx={{ width: 28, height: 28 }} src="/static/images/avatar/1.jpg" />
+                    <Avatar alt={chat.name} sx={{ width: 28, height: 28, fontSize: '1rem' }} src="/static/images/avatar/1.jpg" />
                   </ListItemIcon>
                   <ListItemText
                     primary={chat.name}
