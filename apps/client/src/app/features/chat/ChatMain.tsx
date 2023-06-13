@@ -46,7 +46,7 @@ export function ChatMain() {
         selectedChat={selectedChat}
         onAddChatClick={() => {
           const participants = user ? [omit(user, '__typename')] : [];
-          dispatch(addChatAsync({ chat: { participants } }));
+          dispatch(addChatAsync({ chat: { participants }, navigate }));
         }}
         onChatClick={chatId => {
           navigate(`/chats/${chatId}`);

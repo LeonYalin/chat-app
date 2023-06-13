@@ -13,6 +13,7 @@ import {
   loadChatApi,
 } from './chat.api';
 import { User } from '@shared/models/user.model';
+import { useNavigate } from 'react-router-dom';
 
 export interface ChatState {
   chats: Chat[];
@@ -28,16 +29,8 @@ const initialState: ChatState = {
   uiState: UIState.IDLE,
 };
 
-export const addChatAsync = createAsyncThunk('chat/addChatAsync', ({ chat }: { chat: Partial<Chat> }) => {
-  return addChatApi({ chat: createChat({ ...chat }) });
-});
-
 export const loadChatAsync = createAsyncThunk('chat/loadChatAsync', ({ chatId }: { chatId: string }) => {
   return loadChatApi({ chatId });
-});
-
-export const deleteChatAsync = createAsyncThunk('chat/deleteChatAsync', ({ chatId }: { chatId: string }) => {
-  return deleteChatApi({ chatId });
 });
 
 export const changeChatNameAsync = createAsyncThunk(
@@ -53,6 +46,41 @@ export const addChatMessageAsync = createAsyncThunk(
     return addChatMessageApi({ chatId, content });
   },
 );
+
+export const deleteChatAsync =
+  ({ chatId, navigate }: { chatId: string; navigate: ReturnType<typeof useNavigate> }): AppThunk =>
+  (dispatch, getState) => {
+    deleteChatApi({ chatId })
+      .then(res => {
+        const deletedChatId = res.data?.deleteChat;
+        if (deletedChatId) {
+          dispatch(deleteChat({ chatId: deletedChatId }));
+          const newSelectedChatId = getState().chat.chats.at(-1)?.id || null;
+          dispatch(setSelectedChatId({ selectedChatId: newSelectedChatId }));
+          navigate(`/chats/${newSelectedChatId}`);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+export const addChatAsync =
+  ({ chat, navigate }: { chat: Partial<Chat>; navigate: ReturnType<typeof useNavigate> }): AppThunk =>
+  (dispatch, getState) => {
+    addChatApi({ chat: createChat({ ...chat }) })
+      .then(res => {
+        const addedChat = res.data?.addChat;
+        if (addedChat) {
+          dispatch(addChat({ chat: addedChat }));
+          dispatch(setSelectedChatId({ selectedChatId: addedChat.id }));
+          navigate(`/chats/${addedChat.id}`);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
 export const loadAllChatsAsync = (): AppThunk => (dispatch, getState) => {
   loadAllChatsApi()
@@ -86,6 +114,10 @@ export const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
+    addChat: (state, action: PayloadAction<{ chat: Chat }>) => {
+      const { chat } = action.payload;
+      state.chats.push(chat);
+    },
     setChats: (state, action: PayloadAction<{ chats: Chat[] }>) => {
       const { chats } = action.payload;
       state.chats = chats;
@@ -97,6 +129,10 @@ export const chatSlice = createSlice({
         state.chats[index] = chat;
       }
     },
+    deleteChat: (state, action: PayloadAction<{ chatId: string }>) => {
+      const { chatId } = action.payload;
+      state.chats = state.chats.filter(chat => chat.id !== chatId);
+    },
     setSelectedChatId: (state, action: PayloadAction<{ selectedChatId: string | null }>) => {
       const { selectedChatId } = action.payload;
       state.selectedChatId = selectedChatId;
@@ -104,25 +140,11 @@ export const chatSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(addChatAsync.fulfilled, (state, action) => {
-        const addedChat = action.payload.data?.addChat;
-        if (addedChat) {
-          state.chats.push(addedChat);
-          state.selectedChatId = addedChat.id;
-        }
-      })
       .addCase(loadChatAsync.fulfilled, (state, action) => {
         const loadedChat = action.payload.data.loadChat;
         const index = state.chats.findIndex(chat => chat.id === loadedChat.id);
         state.chats[index] = loadedChat;
         state.selectedChatId = loadedChat.id;
-      })
-      .addCase(deleteChatAsync.fulfilled, (state, action) => {
-        const deletedChatId = action.payload.data?.deleteChat;
-        if (deletedChatId) {
-          state.chats = state.chats.filter(chat => chat.id !== deletedChatId);
-          state.selectedChatId = state.chats.length ? state.chats[0].id : null;
-        }
       })
       .addCase(changeChatNameAsync.fulfilled, (state, action) => {
         const changedChat = action.payload.data?.changeChatName;
@@ -164,7 +186,7 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { setChats, updateChat, setSelectedChatId } = chatSlice.actions;
+export const { setChats, updateChat, addChat, deleteChat, setSelectedChatId } = chatSlice.actions;
 
 export const selectChatState = (state: RootState) => state.chat;
 export const selectChats = (state: RootState) => state.chat.chats;

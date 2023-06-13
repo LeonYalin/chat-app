@@ -38,7 +38,7 @@ export function ChatDetailsMain() {
         user={user}
         allUsers={allUsers}
         participantsEmpty={participantsEmpty}
-        onChatDelete={chatId => dispatch(deleteChatAsync({ chatId }))}
+        onChatDelete={chatId => dispatch(deleteChatAsync({ chatId, navigate }))}
         onChatNameChange={(chatId, newName) => dispatch(changeChatNameAsync({ chatId, newName }))}
         onSignOut={() => dispatch(signOutAsync({ navigate }))}
         onUserDelete={() => dispatch(deleteUserAsync({ userEmail: user?.email || '', navigate }))}
