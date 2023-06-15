@@ -77,10 +77,10 @@ export const handlers = [
     const mockCurrentUser = createUser({ name: 'Test User 1' });
     const mockUser2 = createUser({ name: 'Test User 2' });
     const mockUser3 = createUser({ name: 'Test User 3' });
-    const mockUsers = [mockCurrentUser, mockUser2, mockUser3];
+    const mockAllUsers = [mockCurrentUser, mockUser2, mockUser3];
     return res(
       ctx.data({
-        loadAllUsers: mockUsers,
+        loadAllUsers: mockAllUsers,
       }),
     );
   }),

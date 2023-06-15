@@ -16,19 +16,22 @@ it('should render correctly', () => {
   expect(baseElement).toBeTruthy();
 });
 
-it('should render a chat message correctly, and pass onChatMessage callback', () => {
+it('should render a chat message correctly, and pass onChatMessage callback', async () => {
   const { baseElement } = renderWithProviders(<ChatMessageBox onChatMessage={mockOnChatMessage} />);
   expect(baseElement).toBeTruthy();
 
-  const input = screen.getByTestId('chat-message-box-input');
+  const input = await screen.findByTestId('chat-message-box-input');
   expect(input).toBeTruthy();
   fireEvent.input(input as Element, { target: { value: '123' } });
   expect((input as HTMLInputElement).value).toEqual('123');
 
-  const sendBtn = screen.queryByTestId('chat-message-box-send-btn');
+  const sendBtn = await screen.findByTestId('chat-message-box-send-btn');
   expect(sendBtn).toBeTruthy();
   fireEvent.click(sendBtn as Element);
-  expect(mockOnChatMessage).toHaveBeenCalledWith('123');
+  await waitFor(() => {
+    expect(mockOnChatMessage).toHaveBeenCalledWith('123');
+    expect((input as HTMLInputElement).value).toEqual('');
+  });
 });
 
 it('should disable input and button if disable flag provided', async () => {

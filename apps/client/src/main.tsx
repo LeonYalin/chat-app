@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import App from './app/app';
 import { Provider } from 'react-redux';
-import { ConfirmDialogProvider } from './app/hooks/useConfirm';
+import { AppDialogsProvider } from './app/hooks/useDialog';
 import store from './app/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -12,11 +12,11 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <StrictMode>
     <Provider store={store}>
-      <ConfirmDialogProvider>
+      <AppDialogsProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </ConfirmDialogProvider>
+      </AppDialogsProvider>
     </Provider>
   </StrictMode>,
 );

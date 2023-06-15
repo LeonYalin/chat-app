@@ -21,8 +21,8 @@ mutation ChangeChatName($chatId: String!, $newName: String!) {
 `;
 
 export const AddChatMessageMutationStr = `
-mutation AddChatMessage($chatId: String!, $content: String!) {
-    addChatMessage(chatId: $chatId, content: $content) {
+mutation AddChatMessage($chatId: String!, $content: String!, $userName: String!) {
+    addChatMessage(chatId: $chatId, content: $content, userName: $userName) {
       chatId
       message {
         ...ChatMessageFields

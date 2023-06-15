@@ -9,7 +9,9 @@ type Props = {
 };
 
 const Wrapper = styled.div`
+  background-color: #ececec;
   display: flex;
+  padding: 16px 24px;
 }`;
 
 export function ChatMessageBox(props: Props) {
@@ -18,7 +20,7 @@ export function ChatMessageBox(props: Props) {
     <Wrapper>
       <TextField
         disabled={props.disabled}
-        inputProps={{ 'data-testid': 'chat-message-box-input' }}
+        inputProps={{ 'data-testid': 'chat-message-box-input', sx: { backgroundColor: 'white' } }}
         id="msgbox"
         value={text}
         onChange={e => setText(e.target.value)}
@@ -31,7 +33,10 @@ export function ChatMessageBox(props: Props) {
         color="primary"
         aria-label="Send"
         disabled={props.disabled || text.length === 0}
-        onClick={() => props.onChatMessage(text)}
+        onClick={() => {
+          setText('');
+          props.onChatMessage(text);
+        }}
       >
         <SendIcon fontSize="large" />
       </IconButton>

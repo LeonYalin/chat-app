@@ -1,6 +1,6 @@
 import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { renderWithProviders } from '@client/utils/test-utils';
-import { ConfirmDialogProvider } from '@client/hooks/useConfirm';
+import { AppDialogsProvider } from '@client/hooks/useDialog';
 import { User, createUser } from '@shared/models/user.model';
 import { ChatHeaderParticipants } from './ChatHeaderParticipants';
 
@@ -23,14 +23,14 @@ beforeEach(() => {
     /**/
   });
   baseElement = renderWithProviders(
-    <ConfirmDialogProvider>
+    <AppDialogsProvider>
       <ChatHeaderParticipants
         user={mockCurrentUser}
         participants={participants}
         availableParticipants={availableParticipants}
         onParticipantsChange={onParticipantsChange}
       />
-    </ConfirmDialogProvider>,
+    </AppDialogsProvider>,
   ).baseElement;
 });
 

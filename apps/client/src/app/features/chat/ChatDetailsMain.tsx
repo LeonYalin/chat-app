@@ -13,6 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { deleteUserAsync, selectAllUsers, selectUser, signOutAsync } from '../auth/auth.slice';
 import { omit } from 'lodash';
+import { ChatMessageBox } from './ChatMessageBox';
 
 export function ChatDetailsMain() {
   const navigate = useNavigate();
@@ -51,11 +52,13 @@ export function ChatDetailsMain() {
           chatId && dispatch(changeChatParticipantsAsync({ chatId, participants, newName }));
         }}
       ></ChatHeader>
-      <ChatBody
-        chat={selectedChat}
-        participantsEmpty={participantsEmpty}
-        onChatMessage={content => dispatch(addChatMessageAsync({ chatId: selectedChat?.id || '', content }))}
-      ></ChatBody>
+      <ChatBody chat={selectedChat} user={user}></ChatBody>
+      {selectedChat && (
+        <ChatMessageBox
+          disabled={participantsEmpty}
+          onChatMessage={content => dispatch(addChatMessageAsync({ chatId: selectedChat?.id || '', content, userName: user?.name || '' }))}
+        ></ChatMessageBox>
+      )}
     </>
   );
 }

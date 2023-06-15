@@ -43,16 +43,17 @@ async function testLoadChat(testServer: ApolloServer, mockChatId: string, { expe
   expect(data.loadChat).toEqual(expected);
 }
 
-async function testAddChatMessage(testServer: ApolloServer, chatId: string, content: string) {
-  const response = await testServer.executeOperation<{ chatId: string; content: string }>({
+async function testAddChatMessage(testServer: ApolloServer, chatId: string, content: string, userName: string) {
+  const response = await testServer.executeOperation<{ chatId: string; content: string; userName: string }>({
     query: `${ChatMessageFieldsFragmentStr}${AddChatMessageMutationStr}`,
-    variables: { chatId, content },
+    variables: { chatId, content, userName },
   });
 
   const { data, errors } = getResponseData<{ addChatMessage: { chatId: string; message: ChatMessage } }>(response);
   expect(errors).toBeUndefined();
   expect(data.addChatMessage.chatId).toEqual(chatId);
   expect(data.addChatMessage.message.content).toEqual(content);
+  expect(data.addChatMessage.message.userName).toEqual(userName);
 }
 
 async function testChangeChatName(testServer: ApolloServer, chatId: string, newName: string) {
@@ -278,7 +279,7 @@ describe('Chats server tests', () => {
 
     await testAddChat(testServer, mockChat);
     await testLoadAllChats(testServer, { expected: [mockChat] });
-    await testAddChatMessage(testServer, mockChat.id, 'Hello World');
+    await testAddChatMessage(testServer, mockChat.id, 'Test User', 'Hello World');
   });
 
   test('should change a chat name correctly', async () => {
@@ -405,7 +406,6 @@ describe('Chats server tests', () => {
 
   test('should change a chat participants and a chat name correctly', async () => {
     const testServer = createApolloTestingServer();
-    console.log('before testLoadAllUsers');
     await testLoadAllUsers(testServer, { expected: [] });
 
     const mockUser: User = {

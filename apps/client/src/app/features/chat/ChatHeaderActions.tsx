@@ -2,7 +2,7 @@ import { ListItemAvatar, Avatar, IconButton, Popover, Typography, TextField, But
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useRef, useState } from 'react';
-import { useConfirm } from '@client/hooks/useConfirm';
+import { useDialog } from '@client/hooks/useDialog';
 import { Chat } from '@shared/models/chat.model';
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
 export function ChatHeaderActions(props: Props) {
   const [editPopoverOpen, setEditPopoverOpen] = useState(false);
   const [chatNameForEdit, setChatNameForEdit] = useState('');
-  const { showConfirm, closeConfirm } = useConfirm();
+  const { confirm } = useDialog();
   const editBtnRef = useRef(null);
 
   useEffect(() => {
@@ -68,18 +68,11 @@ export function ChatHeaderActions(props: Props) {
         data-testid="delete-btn"
         aria-label="Delete"
         onClick={() => {
-          showConfirm({
+          confirm.show({
             title: 'Delete Chat',
             content: 'Are you sure you want to delete the chat and all its contents?',
             onConfirm: () => {
               props.chat && props.onChatDelete(props.chat.id);
-              closeConfirm();
-            },
-            onCancel: () => {
-              closeConfirm();
-            },
-            onClose: () => {
-              /** */
             },
           });
         }}

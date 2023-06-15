@@ -57,6 +57,10 @@ export const typeDefs = `
     createdAt: String!
   }
 
+  type Subscription {
+    messageAdded: ChatMessageOutput!
+  }
+
   type Query {
     loadAllChats: [Chat!]!
     loadChat(chatId: String!): Chat!
@@ -68,7 +72,7 @@ export const typeDefs = `
     addChat(chat: ChatInput!): Chat!
     deleteChat(chatId: String!): String!
     changeChatName(chatId: String!, newName: String!): Chat!
-    addChatMessage(chatId: String!, content: String!): ChatMessageOutput!
+    addChatMessage(chatId: String!, content: String!, userName: String!): ChatMessageOutput!
     signUp(name: String!, email: String!, password: String!): User!
     deleteUser(userEmail: String!): String!
     changeChatParticipants(chatId: String!, participants: [UserInput!]!, newName: String): Chat!

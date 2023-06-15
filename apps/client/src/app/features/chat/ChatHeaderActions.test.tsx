@@ -2,7 +2,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { ChatHeaderActions } from './ChatHeaderActions';
 import { createChat } from '@shared/models/chat.model';
 import { renderWithProviders } from '@client/utils/test-utils';
-import { ConfirmDialogProvider } from '@client/hooks/useConfirm';
+import { AppDialogsProvider } from '@client/hooks/useDialog';
 
 let mockChat: ReturnType<typeof createChat> | null = null;
 let onSignOut: jest.Mock;
@@ -22,9 +22,9 @@ beforeEach(() => {
 
 beforeEach(() => {
   baseElement = renderWithProviders(
-    <ConfirmDialogProvider>
+    <AppDialogsProvider>
       <ChatHeaderActions chat={mockChat} onChatDelete={onSignOut} onChatNameChange={onUserDelete} />
-    </ConfirmDialogProvider>,
+    </AppDialogsProvider>,
   ).baseElement;
 });
 it('should render successfully', () => {

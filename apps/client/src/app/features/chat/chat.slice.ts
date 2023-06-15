@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState, AppThunk } from '../../store';
 import { UIState } from '@client/utils/enums';
-import { createChat, Chat } from '@shared/models/chat.model';
+import { createChat, Chat, ChatMessage } from '@shared/models/chat.model';
 import {
   addChatApi,
   addChatMessageApi,
@@ -42,8 +42,8 @@ export const changeChatNameAsync = createAsyncThunk(
 
 export const addChatMessageAsync = createAsyncThunk(
   'chat/addChatMessageAsync',
-  ({ chatId, content }: { chatId: string; content: string }) => {
-    return addChatMessageApi({ chatId, content });
+  ({ chatId, content, userName }: { chatId: string; content: string; userName: string }) => {
+    return addChatMessageApi({ chatId, content, userName });
   },
 );
 
@@ -133,6 +133,16 @@ export const chatSlice = createSlice({
       const { chatId } = action.payload;
       state.chats = state.chats.filter(chat => chat.id !== chatId);
     },
+    addChatMessage: (state, action: PayloadAction<{ chatId: string; message: ChatMessage }>) => {
+      const { chatId, message } = action.payload;
+      const chat = state.chats.find(chat => chat.id === chatId);
+      if (chat) {
+        const messageExists = chat.messages.find(m => m.id === message.id);
+        if (!messageExists) {
+          chat.messages.push(message);
+        }
+      }
+    },
     setSelectedChatId: (state, action: PayloadAction<{ selectedChatId: string | null }>) => {
       const { selectedChatId } = action.payload;
       state.selectedChatId = selectedChatId;
@@ -186,7 +196,7 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { setChats, updateChat, addChat, deleteChat, setSelectedChatId } = chatSlice.actions;
+export const { setChats, updateChat, addChat, deleteChat, addChatMessage, setSelectedChatId } = chatSlice.actions;
 
 export const selectChatState = (state: RootState) => state.chat;
 export const selectChats = (state: RootState) => state.chat.chats;

@@ -1,11 +1,12 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { ChatHeaderActions } from './ChatHeaderActions';
 import { createChat } from '@shared/models/chat.model';
 import { renderWithProviders } from '@client/utils/test-utils';
-import { ConfirmDialogProvider } from '@client/hooks/useConfirm';
+import { AppDialogsProvider } from '@client/hooks/useDialog';
 import { ChatHeaderUserMenu } from './ChatHeaderUserMenu';
+import { createUser } from '@shared/models/user.model';
 
 let mockChat: ReturnType<typeof createChat> | null = null;
+let mockUser: ReturnType<typeof createUser> | null = null;
 let mockOnSignOut: jest.Mock;
 let mockOnUserDelete: jest.Mock;
 let baseElement: HTMLElement;
@@ -13,6 +14,7 @@ let baseElement: HTMLElement;
 beforeEach(() => {
   jest.clearAllMocks();
   mockChat = createChat({ name: 'test chat' });
+  mockUser = createUser({ name: 'test user' });
   mockOnSignOut = jest.fn(chatId => {
     /**/
   });
@@ -23,9 +25,9 @@ beforeEach(() => {
 
 beforeEach(() => {
   baseElement = renderWithProviders(
-    <ConfirmDialogProvider>
-      <ChatHeaderUserMenu onSignOut={mockOnSignOut} onUserDelete={mockOnUserDelete}></ChatHeaderUserMenu>
-    </ConfirmDialogProvider>,
+    <AppDialogsProvider>
+      <ChatHeaderUserMenu user={mockUser} onSignOut={mockOnSignOut} onUserDelete={mockOnUserDelete}></ChatHeaderUserMenu>
+    </AppDialogsProvider>,
   ).baseElement;
 });
 it('should render successfully', () => {

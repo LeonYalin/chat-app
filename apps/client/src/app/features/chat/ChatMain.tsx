@@ -1,13 +1,23 @@
 import { Box, Fade, LinearProgress } from '@mui/material';
 import { ChatsPanel } from './ChatsPanel';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { selectChats, selectSelectedChat, addChatAsync, loadAllChatsAsync, setSelectedChatId, selectUIState } from './chat.slice';
+import {
+  selectChats,
+  selectSelectedChat,
+  addChatAsync,
+  loadAllChatsAsync,
+  setSelectedChatId,
+  selectUIState,
+  addChatMessage,
+} from './chat.slice';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { UIState } from '@client/utils/enums';
 import { loadAllUsersAsync, selectUser } from '../auth/auth.slice';
 import { omit } from 'lodash';
+import { messageAddedSubscriptionApi } from './chat.api';
+import { useDialog } from '@client/hooks/useDialog';
 
 const panelWidth = 240;
 
@@ -24,11 +34,33 @@ export function ChatMain() {
   const user = useAppSelector(selectUser);
   const uiState = useAppSelector(selectUIState);
   const navigate = useNavigate();
+  const { toast } = useDialog();
 
   useEffect(() => {
     dispatch(loadAllChatsAsync());
     dispatch(loadAllUsersAsync());
   }, [dispatch]);
+
+  useEffect(() => {
+    const subscription = messageAddedSubscriptionApi().subscribe(res => {
+      const chatId = res.data?.messageAdded.chatId;
+      const message = res.data?.messageAdded.message;
+      if (chatId && message) {
+        const messageIsFromCurrentUser = user?.name === message?.userName;
+        if (!messageIsFromCurrentUser) {
+          toast.show({
+            title: `Message from ${message?.userName}`,
+            message: message?.content,
+            onClick: () => navigate(`/chats/${chatId}`),
+          });
+          dispatch(addChatMessage({ chatId, message: omit(message, '__typename') }));
+        }
+      }
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <Box sx={{ display: 'flex' }}>

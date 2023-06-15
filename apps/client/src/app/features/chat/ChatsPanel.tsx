@@ -87,7 +87,8 @@ export function ChatsPanel(props: Props) {
                 selected={props.selectedChat?.id === chat.id}
                 sx={{
                   '&.Mui-selected': {
-                    backgroundColor: '#dedcdc',
+                    backgroundColor: '#1876d2',
+                    color: 'white',
                   },
                 }}
                 key={chat.id}

@@ -3,6 +3,8 @@ import db from '../db.utils';
 import { throwGqlDefaultError, throwGqlError } from './graphql.server.utils';
 import { User, createUser } from '@shared/models/user.model';
 import { comparePasswordAndHash, hashPassword } from '../crypto.utils';
+import { MESSAGE_ADDED_TOPIC } from '@shared/graphql/subscriptions';
+import pubsub from './pubsub.utils';
 
 export const resolvers = {
   Query: {
@@ -113,14 +115,15 @@ export const resolvers = {
         throwGqlDefaultError(err);
       }
     },
-    addChatMessage: async (data, variables: { chatId: string; content: string }) => {
+    addChatMessage: async (data, variables: { chatId: string; content: string; userName: string }) => {
       try {
         const chats: Chat[] = await db().getObjectDefault<Chat[]>('/chats', []);
-        const { chatId, content } = variables;
+        const { chatId, content, userName } = variables;
         const index = chats.findIndex(chat => chat.id === chatId);
         if (index > -1 && content) {
-          const message = createChatMessage({ content });
+          const message = createChatMessage({ content, userName });
           await db().push(`/chats[${index}]/messages[]`, message);
+          pubsub().publish(MESSAGE_ADDED_TOPIC, { messageAdded: { chatId, message } });
           return { chatId, message };
         } else {
           throwGqlError();
@@ -185,6 +188,11 @@ export const resolvers = {
       } catch (err) {
         throwGqlDefaultError(err);
       }
+    },
+  },
+  Subscription: {
+    messageAdded: {
+      subscribe: () => pubsub().asyncIterator([MESSAGE_ADDED_TOPIC]),
     },
   },
 };

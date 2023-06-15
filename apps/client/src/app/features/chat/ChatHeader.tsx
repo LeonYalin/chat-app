@@ -22,25 +22,29 @@ export function ChatHeader(props: Props) {
     <>
       <Toolbar sx={{ marginLeft: '7px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-          {props.chat && props.participantsEmpty ? (
-            <Typography component={'div'} sx={{ width: '100%', pr: 3 }}>
-              <ChatHeaderParticipants
-                user={props.user}
-                participants={props.chat?.participants}
-                availableParticipants={props.allUsers}
-                onParticipantsChange={props.onParticipantsChange}
-              ></ChatHeaderParticipants>
-            </Typography>
-          ) : (
-            <ChatHeaderActions
-              chat={props.chat}
-              onChatDelete={props.onChatDelete}
-              onChatNameChange={props.onChatNameChange}
-            ></ChatHeaderActions>
-          )}
+          {props.chat ? (
+            props.participantsEmpty ? (
+              <Typography component={'div'} sx={{ width: '100%', pr: 3 }}>
+                <ChatHeaderParticipants
+                  user={props.user}
+                  participants={props.chat?.participants}
+                  availableParticipants={props.allUsers}
+                  onParticipantsChange={props.onParticipantsChange}
+                ></ChatHeaderParticipants>
+              </Typography>
+            ) : (
+              <ChatHeaderActions
+                chat={props.chat}
+                onChatDelete={props.onChatDelete}
+                onChatNameChange={props.onChatNameChange}
+              ></ChatHeaderActions>
+            )
+          ) : null}
         </Box>
         <Box sx={{ flexGrow: 0 }}>
-          {props.user && <ChatHeaderUserMenu onSignOut={props.onSignOut} onUserDelete={props.onUserDelete}></ChatHeaderUserMenu>}
+          {props.user && (
+            <ChatHeaderUserMenu user={props.user} onSignOut={props.onSignOut} onUserDelete={props.onUserDelete}></ChatHeaderUserMenu>
+          )}
         </Box>
       </Toolbar>
       <Divider />

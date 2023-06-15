@@ -7,6 +7,7 @@ import {
   ChangeChatParticipantsMutationStr,
   DeleteChatMutationStr,
 } from '@shared/graphql/mutations';
+import { MessageAddedSubscriptionStr } from '@shared/graphql/subscriptions';
 import { LoadAllChatsQueryStr } from '@shared/graphql/queries';
 import { LoadChatQueryStr } from '@shared/graphql/queries';
 import { Chat, ChatMessage } from '@shared/models/chat.model';
@@ -48,12 +49,12 @@ export function changeChatNameApi({ chatId, newName }: { chatId: string; newName
   });
 }
 
-export function addChatMessageApi({ chatId, content }: { chatId: string; content: string }) {
-  return gqlClient().mutate<{ addChatMessage: { chatId: string; message: ChatMessage } }>({
+export function addChatMessageApi({ chatId, content, userName }: { chatId: string; content: string; userName: string }) {
+  return gqlClient().mutate<{ addChatMessage: { chatId: string; message: ChatMessage; userName: string } }>({
     mutation: gql`
       ${AddChatMessageMutationStr}
     `,
-    variables: { chatId, content },
+    variables: { chatId, content, userName },
   });
 }
 
@@ -71,5 +72,14 @@ export function changeChatParticipantsApi({ chatId, participants, newName }: { c
       ${ChangeChatParticipantsMutationStr}
     `,
     variables: { chatId, participants, newName },
+  });
+}
+
+export function messageAddedSubscriptionApi() {
+  return gqlClient().subscribe<{ messageAdded: { chatId: string; message: ChatMessage } }>({
+    query: gql`
+      ${MessageAddedSubscriptionStr}
+    `,
+    variables: {},
   });
 }
