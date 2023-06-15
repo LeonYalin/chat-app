@@ -5,7 +5,6 @@ import { forwardRef } from 'react';
 
 export default function Toast(props: ToastOptions) {
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    console.log('handleClose', event, reason);
     if (reason === 'clickaway') {
       return;
     }
