@@ -13,7 +13,7 @@ import path from 'path';
 async function startServer() {
   const server = createApolloTestingServer();
   await server.start();
-  let PORT = 4000;
+  const PORT = 4000;
 
   // Now that our HTTP server is fully set up, actually listen.
   const { httpServer, app } = getHttpServers();
@@ -21,7 +21,7 @@ async function startServer() {
 
   // serve static files in production
   if (process.env.NODE_ENV === 'production') {
-    PORT = Number(process.env.PORT) ?? 8080;
+    // PORT = Number(process.env.PORT) || 8080;
     app.use(express.static(__dirname + '/public'));
     app.get('/*', function (req, res) {
       res.sendFile(path.join(__dirname + '/public/index.html'));
